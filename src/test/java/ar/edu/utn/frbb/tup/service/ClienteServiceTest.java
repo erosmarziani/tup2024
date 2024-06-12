@@ -16,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 
@@ -126,6 +125,119 @@ public class ClienteServiceTest {
     }
 
     //Agregar una CA$ y CC$ --> success 2 cuentas, titular peperino
+    @Test
+    public void testAgregarCA$yCC$() throws TipoCuentaAlreadyExistsException{
+        Cliente peperino = new Cliente();
+        peperino.setDni(12345678);
+        peperino.setNombre("Pepe");
+        peperino.setApellido("Rino");
+        peperino.setFechaNacimiento(LocalDate.of(1975,03,25));
+        peperino.setTipoPersona(TipoPersona.PERSONA_FISICA);
+        
+
+        Cuenta cuentaCA = new Cuenta();
+        cuentaCA.setMoneda(TipoMoneda.PESOS);
+        cuentaCA.setBalance(0);
+        cuentaCA.setTipoCuenta(TipoCuenta.CAJA_AHORRO);
+
+        Cuenta cuentaCC = new Cuenta();
+        cuentaCC.setMoneda(TipoMoneda.PESOS);
+        cuentaCC.setBalance(1);
+        cuentaCC.setTipoCuenta(TipoCuenta.CUENTA_CORRIENTE);
+
+        when(clienteDao.find(12345678, false)).thenReturn(peperino);
+
+        //Agregamos la cuenta de caja de ahorro
+        clienteService.agregarCuenta(cuentaCA, 12345678);
+
+        //Agregamos la cuenta corriente
+        clienteService.agregarCuenta(cuentaCC, 12345678);
+
+        verify(clienteDao, times(2)).save(peperino);
+        assertEquals(2, peperino.getCuentas().size());
+
+        assertEquals(peperino, cuentaCA.getTitular());
+        assertEquals(peperino, cuentaCC.getTitular());
+
+    }
     //Agregar una CA$ y CAU$S --> success 2 cuentas, titular peperino...
+    @Test
+    public void testAgregarCA$yCAU$() throws TipoCuentaAlreadyExistsException{
+        Cliente peperino = new Cliente();
+        peperino.setDni(12345678);
+        peperino.setNombre("Pepe");
+        peperino.setApellido("Rino");
+        peperino.setFechaNacimiento(LocalDate.of(1975,03,25));
+        peperino.setTipoPersona(TipoPersona.PERSONA_FISICA);
+        
+
+        Cuenta cuentaCA = new Cuenta();
+        cuentaCA.setMoneda(TipoMoneda.PESOS);
+        cuentaCA.setBalance(0);
+        cuentaCA.setTipoCuenta(TipoCuenta.CAJA_AHORRO);
+
+        Cuenta cuentaCAUSD = new Cuenta();
+        cuentaCAUSD.setMoneda(TipoMoneda.DOLARES);
+        cuentaCAUSD.setBalance(130);
+        cuentaCAUSD.setTipoCuenta(TipoCuenta.CAJA_AHORRO);
+
+        when(clienteDao.find(12345678, false)).thenReturn(peperino);
+
+        //Agregamos la cuenta de caja de ahorro
+        clienteService.agregarCuenta(cuentaCA, 12345678);
+
+        //Agregamos la cuenta corriente
+        clienteService.agregarCuenta(cuentaCAUSD, 12345678);
+
+        verify(clienteDao, times(2)).save(peperino);
+        assertEquals(2, peperino.getCuentas().size());
+
+        assertEquals(peperino, cuentaCA.getTitular());
+        assertEquals(peperino, cuentaCAUSD.getTitular());
     //Testear clienteService.buscarPorDni
+
+
+}
+@Test
+void testBuscarClientePorDniSuccess() {
+    // Configurar el cliente de prueba
+    Cliente peperino = new Cliente();
+    peperino.setDni(12345689L);
+    peperino.setNombre("Pepe");
+    peperino.setApellido("Rino");
+    peperino.setFechaNacimiento(LocalDate.of(2002, 1, 1));
+    peperino.setTipoPersona(TipoPersona.PERSONA_FISICA);
+
+    // Configurar el comportamiento del mock para devolver el cliente
+    when(clienteDao.find(12345689L, true)).thenReturn(peperino);
+
+    // Llamar al método a probar
+    Cliente resultado = clienteService.buscarClientePorDni(12345689L);
+
+    // Verificar que se devolvió el cliente correcto
+    assertNotNull(resultado);
+    assertEquals(12345689L, resultado.getDni());
+
+    // Verificar que se llamó al método find del clienteDao con los parámetros correctos
+    verify(clienteDao, times(1)).find(12345689L, true);
+}
+
+
+
+    @Test
+    public void testBuscarClientePorDniFailed() throws IllegalArgumentException{
+        long dniNoExistente = 99999999L;
+        when(clienteDao.find(dniNoExistente, true)).thenReturn(null);
+
+        
+        // Llamar al método a probar y verificar que se lanza una excepción
+        assertThrows(IllegalArgumentException.class, () -> {
+        clienteService.buscarClientePorDni(dniNoExistente);
+        });
+    
+        // Verificar que se llamó al método find del clienteDao con los parámetros correctos
+        verify(clienteDao, times(1)).find(dniNoExistente, true);
+
+
+    }
 }

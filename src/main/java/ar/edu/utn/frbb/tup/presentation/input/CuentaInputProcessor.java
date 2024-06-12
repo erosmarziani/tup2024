@@ -4,9 +4,9 @@ import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.TipoCuenta;
 import ar.edu.utn.frbb.tup.model.TipoMoneda;
-import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.CuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
+import ar.edu.utn.frbb.tup.model.exception.TipoCuentaNoSportadaException;
 import ar.edu.utn.frbb.tup.persistence.CuentaDao;
 import ar.edu.utn.frbb.tup.service.ClienteService;
 import ar.edu.utn.frbb.tup.service.CuentaService;
@@ -66,6 +66,10 @@ public class CuentaInputProcessor extends BaseInputProcessor{
             return;
         } catch (CuentaAlreadyExistsException e) {
             throw new RuntimeException(e);
+        } catch(TipoCuentaNoSportadaException e){
+            throw new RuntimeException(e);
+        
+        
         } catch (Exception e) {
             System.out.println("Error al dar de alta la cuenta: " + e.getMessage());
         } finally {
