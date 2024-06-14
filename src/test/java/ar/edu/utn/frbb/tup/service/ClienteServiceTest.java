@@ -145,7 +145,7 @@ public class ClienteServiceTest {
         cuentaCC.setBalance(1);
         cuentaCC.setTipoCuenta(TipoCuenta.CUENTA_CORRIENTE);
 
-        when(clienteDao.find(12345678, false)).thenReturn(peperino);
+        doReturn(peperino).when(clienteDao).find(12345678L, true);
 
         //Agregamos la cuenta de caja de ahorro
         clienteService.agregarCuenta(cuentaCA, 12345678);
@@ -181,8 +181,7 @@ public class ClienteServiceTest {
         cuentaCAUSD.setBalance(130);
         cuentaCAUSD.setTipoCuenta(TipoCuenta.CAJA_AHORRO);
 
-        when(clienteDao.find(12345678, false)).thenReturn(peperino);
-
+        doReturn(peperino).when(clienteDao).find(12345678L, true);
         //Agregamos la cuenta de caja de ahorro
         clienteService.agregarCuenta(cuentaCA, 12345678);
 
@@ -194,12 +193,14 @@ public class ClienteServiceTest {
 
         assertEquals(peperino, cuentaCA.getTitular());
         assertEquals(peperino, cuentaCAUSD.getTitular());
-    //Testear clienteService.buscarPorDni
-
-
+    
+    
+    
+        //Testear clienteService.buscarPorDni
 }
 @Test
 void testBuscarClientePorDniSuccess() {
+    
     // Configurar el cliente de prueba
     Cliente peperino = new Cliente();
     peperino.setDni(12345689L);
@@ -209,8 +210,8 @@ void testBuscarClientePorDniSuccess() {
     peperino.setTipoPersona(TipoPersona.PERSONA_FISICA);
 
     // Configurar el comportamiento del mock para devolver el cliente
-    when(clienteDao.find(12345689L, true)).thenReturn(peperino);
-
+    doReturn(peperino).when(clienteDao).find(12345689L, true);
+    
     // Llamar al método a probar
     Cliente resultado = clienteService.buscarClientePorDni(12345689L);
 

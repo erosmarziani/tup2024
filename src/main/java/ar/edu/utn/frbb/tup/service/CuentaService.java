@@ -25,18 +25,16 @@ public class CuentaService {
     //    2 - cuenta no soportada
     //    3 - cliente ya tiene cuenta de ese tipo
     //    4 - cuenta creada exitosamente
-    public void darDeAltaCuenta(Cuenta cuenta, long dniTitular) throws CuentaAlreadyExistsException, TipoCuentaAlreadyExistsException,TipoCuentaNoSportadaException {
-        if(cuentaDao.find(cuenta.getNumeroCuenta()) != null) {
+    public void darDeAltaCuenta(Cuenta cuenta, long dniTitular) throws CuentaAlreadyExistsException, TipoCuentaAlreadyExistsException, TipoCuentaNoSportadaException {
+        if (cuentaDao.find(cuenta.getNumeroCuenta()) != null) {
             throw new CuentaAlreadyExistsException("La cuenta " + cuenta.getNumeroCuenta() + " ya existe.");
         }
-
-        //Chequear cuentas soportadas por el banco CA$ CC$ CAU$S
-        // if (!tipoCuentaEstaSoportada(cuenta)) {...}
-        if (!tipoCuentaEstaSoportada(cuenta.getTipoCuenta(),cuenta.getMoneda())) {
-            throw new TipoCuentaNoSportadaException("El tipo de cuenta + ");
-            
+    
+        // Chequear cuentas soportadas por el banco
+        if (!tipoCuentaEstaSoportada(cuenta.getTipoCuenta(), cuenta.getMoneda())) {
+            throw new TipoCuentaNoSportadaException("El tipo de cuenta no es soportado.");
         }
-
+    
         clienteService.agregarCuenta(cuenta, dniTitular);
         cuentaDao.save(cuenta);
     }
@@ -47,6 +45,10 @@ public class CuentaService {
     }
 
     public boolean tipoCuentaEstaSoportada(TipoCuenta tipoCuenta,TipoMoneda tipoMoneda){
-        return (tipoCuenta == TipoCuenta.CAJA_AHORRO && tipoMoneda == TipoMoneda.PESOS) || (tipoCuenta == TipoCuenta.CUENTA_CORRIENTE && tipoMoneda == TipoMoneda.PESOS) || (tipoCuenta == TipoCuenta.CUENTA_CORRIENTE && tipoMoneda ==  TipoMoneda.DOLARES);
+        return (tipoCuenta == TipoCuenta.CAJA_AHORRO && tipoMoneda == TipoMoneda.PESOS) || 
+        (tipoCuenta == TipoCuenta.CUENTA_CORRIENTE && tipoMoneda == TipoMoneda.PESOS) || 
+        (tipoCuenta == TipoCuenta.CAJA_AHORRO && tipoMoneda ==  TipoMoneda.DOLARES);
     }
+
+    
 }

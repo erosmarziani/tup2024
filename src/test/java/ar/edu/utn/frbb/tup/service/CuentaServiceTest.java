@@ -1,8 +1,13 @@
 package ar.edu.utn.frbb.tup.service;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -21,6 +26,7 @@ import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.TipoCuenta;
 import ar.edu.utn.frbb.tup.model.TipoMoneda;
+import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.CuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaNoSportadaException;
@@ -45,61 +51,98 @@ public class CuentaServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
+        //    1 - cuenta existente
+        @Test
     void testCuentaYaExistente() throws CuentaAlreadyExistsException, TipoCuentaAlreadyExistsException, TipoCuentaNoSportadaException {
+        
+        //Configurar la cuenta y el dni del titular de prueba
         Cuenta cuenta = new Cuenta();
         cuenta.setNumeroCuenta(1L);
         long dniTitular = 123456789;
 
+        //Configurar el comportamiento del mock
         when(cuentaDao.find(anyLong())).thenReturn(new Cuenta());
 
+        // Verificar que se lanza la excepcion CuentaAlreadyExistsException
         assertThrows(CuentaAlreadyExistsException.class,() -> cuentaService.darDeAltaCuenta(cuenta, dniTitular));
 
+        //Verificar que no se llamen ciertos metodos
         verify(clienteService, never()).agregarCuenta(any(Cuenta.class), anyLong());
         verify(cuentaDao, never()).save(any(Cuenta.class));
     }
 
+      //    2 - cuenta no soportada
+      @Test
+      void testTipoCuentaNoSoportada() throws CuentaAlreadyExistsException,TipoCuentaAlreadyExistsException {
+        
+        //Configurar la cuenta de prueba
+          Cuenta cuenta = new Cuenta();
+          cuenta.setTipoCuenta(TipoCuenta.CUENTA_CORRIENTE);
+          cuenta.setMoneda(TipoMoneda.DOLARES);
+          cuenta.setNumeroCuenta(1L);
+          
+          long dniTitular = 123455678l;
+        //Configurar el comportamiento del mock
+          when(cuentaDao.find(cuenta.getNumeroCuenta())).thenReturn(null);
+  
+          // Act & Assert 
+          assertThrows(TipoCuentaNoSportadaException.class, () -> cuentaService.darDeAltaCuenta(cuenta, dniTitular));
+  
+          // Verificar que ciertos métodos no se llamen cuando el tipo de cuenta no es soportado
+          verify(clienteService, never()).agregarCuenta(any(Cuenta.class), anyLong());
+          verify(cuentaDao, never()).save(any(Cuenta.class));
+      }
+      
+      //    3 - cliente ya tiene cuenta de ese tipo
+     @Test
+      void testTipoCuentaYaExistente() throws TipoCuentaAlreadyExistsException, TipoCuentaNoSportadaException {
+          //Configurar el cliente y la cuenta de prueba 
+          Cuenta cuentaExistente = new Cuenta();
+          cuentaExistente.setMoneda(TipoMoneda.PESOS);
+          cuentaExistente.setTipoCuenta(TipoCuenta.CAJA_AHORRO);
+  
+          Cliente cliente = new Cliente();
+          cliente.setDni(123456789L);
+          cliente.addCuenta(cuentaExistente);
+        
+          //Configurar el comportamiento del mock
+          when(clienteService.buscarClientePorDni(anyLong())).thenReturn(cliente);
+  
+          Cuenta cuentaNueva = new Cuenta();
+          cuentaNueva.setMoneda(TipoMoneda.PESOS);
+          cuentaNueva.setTipoCuenta(TipoCuenta.CAJA_AHORRO);
+          long dniTitular = 123456789L;
+          
+  
+          // Act & Assert
+          assertThrows(TipoCuentaAlreadyExistsException.class, () -> cuentaService.darDeAltaCuenta(cuentaNueva, dniTitular));
+        
+          //Verificacion
+          verify(clienteService, times(1)).buscarClientePorDni(dniTitular);
+          verify(clienteService, never()).agregarCuenta(any(Cuenta.class), anyLong());
+          verify(cuentaDao, never()).save(any(Cuenta.class));
+      }
+  
 
-
+        //    4 - cuenta creada exitosamente
     @Test
-    void testTipoCuentaNoSoportada() throws CuentaAlreadyExistsException, TipoCuentaAlreadyExistsException, TipoCuentaNoSportadaException {
+    void testCuentaCreadaSucces(){
 
+        //Configuracion del objeto de prueba
         Cuenta cuenta = new Cuenta();
-        cuenta.setTipoCuenta(TipoCuenta.CUENTA_CORRIENTE);
-        cuenta.setMoneda(TipoMoneda.DOLARES);
-        long dniTitular = 123455678;
+        cuenta.setNumeroCuenta(1L);
+        cuenta.setMoneda(TipoMoneda.PESOS);
+        cuenta.setTipoCuenta(TipoCuenta.CAJA_AHORRO);
 
-        //Act & Assert 
-        assertThrows(TipoCuentaNoSportadaException.class, () -> cuentaService.darDeAltaCuenta(cuenta, dniTitular));
+        long dniTitular = 12345678L;
 
-         verify(clienteService, never()).agregarCuenta(any(Cuenta.class), anyLong());
-         verify(cuentaDao, never()).save(any(Cuenta.class));
-    }
+        //Configuracion del comportamiento del mock
+        when(cuentaDao.find(cuenta.getNumeroCuenta())).thenReturn(null);
 
-   @Test
-    void testTipoCuentaYaExistente() throws TipoCuentaAlreadyExistsException, TipoCuentaNoSportadaException {
-        // Arrange
-        Cuenta cuentaExistente = new Cuenta();
-        cuentaExistente.setMoneda(TipoMoneda.PESOS);
-        cuentaExistente.setTipoCuenta(TipoCuenta.CAJA_AHORRO);
+        //Ejecuto el metodo a testear
+        assertDoesNotThrow(() -> cuentaService.darDeAltaCuenta(cuenta, dniTitular));
 
-        Cliente cliente = new Cliente();
-        cliente.setDni(123456789L);
-        cliente.addCuenta(cuentaExistente);
-
-        when(clienteService.buscarClientePorDni(anyLong())).thenReturn(cliente);
-
-        Cuenta cuentaNueva = new Cuenta();
-        cuentaNueva.setMoneda(TipoMoneda.PESOS);
-        cuentaNueva.setTipoCuenta(TipoCuenta.CAJA_AHORRO);
-        long dniTitular = 123456789;
-
-        // Act & Assert
-        assertThrows(TipoCuentaAlreadyExistsException.class, () -> cuentaService.darDeAltaCuenta(cuentaNueva, dniTitular));
-
-        verify(clienteService, times(1)).buscarClientePorDni(dniTitular);
-        verify(clienteService, never()).agregarCuenta(any(Cuenta.class), anyLong());
-        verify(cuentaDao, never()).save(any(Cuenta.class));
-    }
-
+        //Verificar que se guardo la cuenta
+        verify(cuentaDao, times(1)).save(cuenta);
+        }
 }
