@@ -3,8 +3,12 @@ package ar.edu.utn.frbb.tup.model;
 import java.time.LocalDateTime;
 import java.util.Random;
 
+import ar.edu.utn.frbb.tup.model.exception.CantidadNegativaException;
+
+import ar.edu.utn.frbb.tup.model.exception.NoAlcanzaException;
+
 public class Cuenta {
-    private long numeroCuenta;
+    private long idCuenta;
     LocalDateTime fechaCreacion;
     int balance;
     TipoCuenta tipoCuenta;
@@ -12,7 +16,7 @@ public class Cuenta {
     TipoMoneda moneda;
 
     public Cuenta() {
-        this.numeroCuenta = new Random().nextLong();
+        this.idCuenta = new Random().nextLong();
         this.balance = 0;
         this.fechaCreacion = LocalDateTime.now();
     }
@@ -75,7 +79,7 @@ public class Cuenta {
     }
 
     public void setNumeroCuenta(long numeroCuenta) {
-        this.numeroCuenta = numeroCuenta;
+        this.idCuenta = numeroCuenta;
     }
 
     public void forzaDebitoDeCuenta(int i) {
@@ -83,7 +87,7 @@ public class Cuenta {
     }
 
     public long getNumeroCuenta() {
-        return numeroCuenta;
+        return idCuenta;
     }
 
 
