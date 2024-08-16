@@ -19,6 +19,8 @@ import ar.edu.utn.frbb.tup.persistence.exception.ErrorActualizarClienteException
 public class ClienteDaoImpl implements ClientesDAO{
 
     private static final String FILE_PATH = "src" + File.separator + "main" + File.separator + "java" + File.separator + "ar" + File.separator + "edu" + File.separator + "utn" + File.separator + "frbb" + File.separator + "tup" + File.separator + "persistence" + File.separator + "resources" + File.separator + "clientes.txt";
+   
+   
     @Override
     public void guardarCliente(Cliente cliente) throws ErrorGuardarClienteException {
         File file = new File(FILE_PATH); //Creacion de archivo mediante la clase File
@@ -77,6 +79,10 @@ public class ClienteDaoImpl implements ClientesDAO{
                 if (!inputFile.delete()) {
                     throw new ErrorEliminarArchivoException("Error al eliminar el archivo original");
                     
+                }
+
+                if (!tempFile.renameTo(inputFile)) {
+                    throw new ErrorEliminarArchivoException("Error al renombrar el archivo temporal");
                 }
             };
 
@@ -170,6 +176,8 @@ public List<Cliente> obtenerListaClientes() throws ErrorArchivoNoEncontradoExcep
         for (Cliente c : clientes) {
             if (c.getDni() == cliente.getDni()) {
                 clienteEncontrado = true;
+                break; //Salir del bucle si se encuentra el cliente 
+            }
 
     }
 
@@ -186,5 +194,5 @@ public List<Cliente> obtenerListaClientes() throws ErrorArchivoNoEncontradoExcep
     }
         
 
-}
+
     }}
