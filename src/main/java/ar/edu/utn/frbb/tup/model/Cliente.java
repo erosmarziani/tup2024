@@ -18,6 +18,13 @@ public class Cliente extends Persona{
     public Cliente() {
         super();
     }
+    public Cliente(long dni, String apellido, String nombre, LocalDate fechaNacimiento, TipoPersona tipoPersona, String banco, LocalDate fechaAlta) {
+        super(dni, apellido, nombre, fechaNacimiento);
+        this.tipoPersona = tipoPersona;
+        this.banco = banco;
+        this.fechaAlta = fechaAlta;
+    }
+    
     public Cliente(ClienteDto clienteDto) {
         super(clienteDto.getDni(), clienteDto.getApellido(), clienteDto.getNombre(), clienteDto.getFechaNacimiento());
         fechaAlta = LocalDate.now();

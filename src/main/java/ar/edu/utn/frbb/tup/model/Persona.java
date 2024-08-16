@@ -10,11 +10,11 @@ public class Persona {
     private LocalDate fechaNacimiento;
 
     public Persona() {}
-    public Persona(long dni, String apellido, String nombre, String fechaNacimiento) {
+    public Persona(long dni, String apellido, String nombre, LocalDate fechaNacimiento) {
         this.dni = dni;
         this.apellido = apellido;
         this.nombre = nombre;
-        this.fechaNacimiento = LocalDate.parse(fechaNacimiento);
+        this.fechaNacimiento = fechaNacimiento;
     }
 
     public String getNombre() {
