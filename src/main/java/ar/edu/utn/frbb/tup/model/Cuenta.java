@@ -1,7 +1,6 @@
 package ar.edu.utn.frbb.tup.model;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Random;
 
 import ar.edu.utn.frbb.tup.model.exception.CantidadNegativaException;
@@ -13,30 +12,30 @@ public class Cuenta {
     LocalDate fechaCreacion;
     int balance;
     TipoCuenta tipoCuenta;
-    Cliente titular;
+    long idTitular;
     TipoMoneda moneda;
 
 
-    public Cuenta(long idCuenta,LocalDate fechaCreacion,int balance,TipoCuenta tipoCuenta, Cliente titular, TipoMoneda moneda) {
+    public Cuenta(long idCuenta,LocalDate fechaCreacion,int balance,TipoCuenta tipoCuenta, long titular, TipoMoneda moneda) {
         this.idCuenta = idCuenta;
         this.fechaCreacion = fechaCreacion;
         this.balance = balance;
         this.tipoCuenta = tipoCuenta;
-        this.titular = titular;
+        this.idTitular = titular;
         this.moneda = moneda;
     }
     public Cuenta() {
         this.idCuenta = new Random().nextLong();
         this.balance = 0;
-        this.fechaCreacion = LocalDateTime.now();
+        this.fechaCreacion = LocalDate.now();
     }
 
-    public Cliente getTitular() {
-        return titular;
+    public long getTitular() {
+        return idTitular;
     }
 
-    public void setTitular(Cliente titular) {
-        this.titular = titular;
+    public void setTitular(long idTitular) {
+        this.idTitular = idTitular;
     }
 
 
@@ -59,11 +58,11 @@ public class Cuenta {
     }
 
 
-    public LocalDateTime getFechaCreacion() {
+    public LocalDate getFechaCreacion() {
         return fechaCreacion;
     }
 
-    public Cuenta setFechaCreacion(LocalDateTime fechaCreacion) {
+    public Cuenta setFechaCreacion(LocalDate fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
         return this;
     }
