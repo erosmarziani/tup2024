@@ -1,5 +1,6 @@
 package ar.edu.utn.frbb.tup.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Random;
 
@@ -9,12 +10,21 @@ import ar.edu.utn.frbb.tup.model.exception.NoAlcanzaException;
 
 public class Cuenta {
     private long idCuenta;
-    LocalDateTime fechaCreacion;
+    LocalDate fechaCreacion;
     int balance;
     TipoCuenta tipoCuenta;
     Cliente titular;
     TipoMoneda moneda;
 
+
+    public Cuenta(long idCuenta,LocalDate fechaCreacion,int balance,TipoCuenta tipoCuenta, Cliente titular, TipoMoneda moneda) {
+        this.idCuenta = idCuenta;
+        this.fechaCreacion = fechaCreacion;
+        this.balance = balance;
+        this.tipoCuenta = tipoCuenta;
+        this.titular = titular;
+        this.moneda = moneda;
+    }
     public Cuenta() {
         this.idCuenta = new Random().nextLong();
         this.balance = 0;

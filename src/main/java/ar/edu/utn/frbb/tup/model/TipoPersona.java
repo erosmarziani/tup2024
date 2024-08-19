@@ -15,6 +15,7 @@ public enum TipoPersona {
         return descripcion;
     }
 
+    // Metodo para parsear
     public static TipoPersona fromString(String text) {
         for (TipoPersona tipo : TipoPersona.values()) {
             if (tipo.descripcion.equalsIgnoreCase(text)) {
