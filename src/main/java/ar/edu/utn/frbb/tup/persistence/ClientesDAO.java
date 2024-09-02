@@ -9,6 +9,6 @@ public interface ClientesDAO{
     Cliente obtenerClientePorDNI(long dni) throws Exception;
     List<Cliente> obtenerListaClientes() throws Exception;
     void eliminarCliente(Long dni) throws Exception;
-    void actualizarCliente(Cliente cliente) throws Exception;
+    Cliente actualizarCliente(Cliente cliente) throws Exception;
     
 }

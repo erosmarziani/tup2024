@@ -13,22 +13,32 @@ import java.util.List;
 
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
-import ar.edu.utn.frbb.tup.model.TipoCuenta;
-import ar.edu.utn.frbb.tup.model.TipoMoneda;
-import ar.edu.utn.frbb.tup.model.TipoPersona;
+import ar.edu.utn.frbb.tup.model.enums.*;
 import ar.edu.utn.frbb.tup.persistence.CuentasDAO;
-import ar.edu.utn.frbb.tup.persistence.exception.ErrorActualizarClienteException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorActualizarCuentaException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorArchivoNoEncontradoException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorCuentaNoEncontradaException;
-import ar.edu.utn.frbb.tup.persistence.exception.ErrorEliminarArchivoException;
-import ar.edu.utn.frbb.tup.persistence.exception.ErrorEliminarCuentaException;
-import ar.edu.utn.frbb.tup.persistence.exception.ErrorGuardarClienteException;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorEliminarLineaException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorGuardarCuentaException;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorManejoArchvivoException;
 
 public class CuentaDaoImpl implements CuentasDAO {
     private static final String FILE_PATH = "src" + File.separator + "main" + File.separator + "java" + File.separator + "ar" + File.separator + "edu" + File.separator + "utn" + File.separator + "frbb" + File.separator + "tup" + File.separator + "persistence" + File.separator + "resources" + File.separator + "cuentas.txt";
 
+
+    public Cuenta parsearCuenta(String[] campos){
+        Cuenta cuenta = new Cuenta();
+
+        cuenta.setNumeroCuenta(Long.parseLong(campos[0]));
+        cuenta.setFechaCreacion(LocalDate.parse(campos[1]));
+        cuenta.setBalance(Integer.parseInt(campos[2]));
+        cuenta.setTipoCuenta(TipoCuenta.valueOf(campos[3]));
+        cuenta.setTitular(Long.parseLong(campos[4]));
+        cuenta.setMoneda(TipoMoneda.valueOf(campos[5]));
+        return cuenta;
+
+        
+    }
     @Override
     public void guardarCuenta(Cuenta cuenta) throws ErrorGuardarCuentaException { 
         File file = new File(FILE_PATH);
@@ -87,13 +97,14 @@ public class CuentaDaoImpl implements CuentasDAO {
             throw new ErrorArchivoNoEncontradoException("Error al leer el archivo", e);
         }
 
-        throw new ErrorCuentaNoEncontradaException("No se encontró la cuenta con el número: " + idCuenta);
+       return null;
     }
 
     @Override
-    public void eliminarCuenta(long cuentaID) throws ErrorEliminarCuentaException,ErrorEliminarArchivoException {
+    public Cuenta eliminarCuenta(long cuentaID) throws ErrorEliminarLineaException,ErrorManejoArchvivoException {
         File inputFile = new File(FILE_PATH);
         File tempFile = new File(inputFile.getAbsolutePath() + ".tmp");
+        Cuenta cuentaEliminada = null;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
@@ -108,28 +119,61 @@ public class CuentaDaoImpl implements CuentasDAO {
                     isHeader = false;
                     continue;
                 }
-                String[] parts = line.split(";");
-                if (parts.length >= 6) {
-                    long idActual = Long.parseLong(parts[0]);
-                    if (idActual != cuentaID) {
+                String[] campos = line.split(";");
+                if (campos.length >= 6) {
+                    long idActual = Long.parseLong(campos[0]);
+                    if (idActual == cuentaID) {
+                        cuentaEliminada = parsearCuenta(campos);
+                        
+                    }else{
                         writer.write(line);
                         writer.newLine();
                     }
                 }
             }
         } catch (IOException e) {
-            throw new ErrorEliminarCuentaException("Error al eliminar la cuenta: " + e.getMessage());
+            throw new ErrorEliminarLineaException("Error al eliminar la cuenta: " + e.getMessage());
         }
 
         if (!inputFile.delete()) {
-            throw new ErrorEliminarArchivoException("Error al eliminar el archivo original");
+            throw new ErrorManejoArchvivoException("Error al eliminar el archivo original");
         }
 
         if (!tempFile.renameTo(inputFile)) {
-            throw new ErrorEliminarArchivoException("Error al renombrar el archivo temporal");
+            throw new ErrorManejoArchvivoException("Error al renombrar el archivo temporal");
         }
+        return cuentaEliminada;
     }
 
+    @Override
+    public List<Cuenta> obtenerCuentasDelCliente(long idCliente) throws ErrorArchivoNoEncontradoException{
+        List<Cuenta> cuentasDelCliente = new ArrayList<>();
+        File file = new File(FILE_PATH);
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            boolean isHeader = true;
+
+            while ((line = reader.readLine()) != null) {
+                if (isHeader) {
+                    isHeader = false;
+                    continue;
+                }
+                else{
+                String[] campos = line.split(";");
+                if (Long.parseLong(campos[4]) == idCliente){
+                    Cuenta cuenta = parsearCuenta(campos);
+                    cuentasDelCliente.add(cuenta);
+                }
+            
+                
+            }
+        }}catch(IOException e){
+            throw new ErrorArchivoNoEncontradoException("Error al leer el archivo: " , e);
+        }
+        return cuentasDelCliente;
+    }
+        
+    
     @Override
     public List<Cuenta> obtenerCuentas() throws ErrorArchivoNoEncontradoException,ErrorCuentaNoEncontradaException {
         List<Cuenta> cuentasEncontradas = new ArrayList<>();
@@ -144,17 +188,9 @@ public class CuentaDaoImpl implements CuentasDAO {
                 continue;
             }
 
-            String[] datos = line.split(";");
-            if (datos.length >= 6) {
-                    long idCuenta = Long.parseLong(datos[0]);
-                    LocalDate fechaCreacion = LocalDate.parse(datos[1]);
-                    int balance = Integer.parseInt(datos[2]);
-                    TipoCuenta tipoCuenta = TipoCuenta.valueOf(datos[3]);
-                    long cliente = Long.parseLong(datos[4]);
-                    TipoMoneda tipoMoneda = TipoMoneda.valueOf(datos[5]);
-
-                    // Crear un nuevo cliente y agregarlo a la lista para devolverlo
-                    Cuenta cuenta = new Cuenta(idCuenta,fechaCreacion,balance,tipoCuenta,cliente,tipoMoneda);
+            String[] campos = line.split(";");
+            if (campos.length >= 6) {
+                    Cuenta cuenta = parsearCuenta(campos);
                     cuentasEncontradas.add(cuenta);
                 
             }

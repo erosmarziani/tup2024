@@ -3,6 +3,7 @@ package ar.edu.utn.frbb.tup.model;
 import java.time.LocalDate;
 import java.util.Random;
 
+import ar.edu.utn.frbb.tup.model.enums.*;
 import ar.edu.utn.frbb.tup.model.exception.CantidadNegativaException;
 
 import ar.edu.utn.frbb.tup.model.exception.NoAlcanzaException;

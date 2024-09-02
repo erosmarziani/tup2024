@@ -1,52 +1,103 @@
 package ar.edu.utn.frbb.tup.service;
 
-import ar.edu.utn.frbb.tup.controller.ClienteDto;
+import ar.edu.utn.frbb.tup.controller.Dto.ClienteDto;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
-import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
-import ar.edu.utn.frbb.tup.persistence.ClienteDao;
+import ar.edu.utn.frbb.tup.persistence.exception.ClienteNoEncontradoException;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorActualizarClienteException;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorArchivoNoEncontradoException;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorEliminarLineaException;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorGuardarClienteException;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorManejoArchvivoException;
+import ar.edu.utn.frbb.tup.persistence.implementation.ClienteDaoImpl;
+import ar.edu.utn.frbb.tup.persistence.implementation.CuentaDaoImpl;
+import ar.edu.utn.frbb.tup.service.exception.ClienteMenorDeEdadException;
+import ar.edu.utn.frbb.tup.service.exception.CuentaNoEncontradaException;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ClienteService {
 
-    ClienteDao clienteDao;
+    @Autowired
+    private ClienteDaoImpl clienteDao;
 
-    public ClienteService(ClienteDao clienteDao) {
+    @Autowired
+    private CuentaDaoImpl cuentaDao;    
+
+    public ClienteService(ClienteDaoImpl clienteDao) {
         this.clienteDao = clienteDao;
     }
 
-    public Cliente darDeAltaCliente(ClienteDto clienteDto) throws ClienteAlreadyExistsException {
+    public Cliente darDeAltaCliente(ClienteDto clienteDto) throws ClienteAlreadyExistsException, ClienteMenorDeEdadException, ErrorArchivoNoEncontradoException, ErrorGuardarClienteException {
         Cliente cliente = new Cliente(clienteDto);
 
-        if (clienteDao.find(cliente.getDni(), false) != null) {
+        Cliente clienteEcontrado = clienteDao.obtenerClientePorDNI(cliente.getDni());
+        if (clienteEcontrado != null) {
             throw new ClienteAlreadyExistsException("Ya existe un cliente con DNI " + cliente.getDni());
         }
 
         if (cliente.getEdad() < 18) {
-            throw new IllegalArgumentException("El cliente debe ser mayor a 18 años");
+            throw new ClienteMenorDeEdadException("El cliente debe ser mayor a 18 años");
         }
 
-        clienteDao.save(cliente);
+        clienteDao.guardarCliente(cliente);
         return cliente;
     }
+    
+    public void eliminarCliente(long dni) throws ClienteNoEncontradoException, ErrorArchivoNoEncontradoException, ErrorEliminarLineaException,ErrorManejoArchvivoException, CuentaNoEncontradaException{
+        //Verificar si el cliente existe
+        Cliente cliente = clienteDao.obtenerClientePorDNI(dni);
 
-    public void agregarCuenta(Cuenta cuenta, long dniTitular) throws TipoCuentaAlreadyExistsException {
-        Cliente titular = buscarClientePorDni(dniTitular);
-        cuenta.setTitular(titular);
-        if (titular.tieneCuenta(cuenta.getTipoCuenta(), cuenta.getMoneda())) {
-            throw new TipoCuentaAlreadyExistsException("El cliente ya posee una cuenta de ese tipo y moneda");
+        if (cliente == null) {
+            throw new ClienteNoEncontradoException("El cliente no ha sido encontrado en la base de datos");
         }
-        titular.addCuenta(cuenta);
-        clienteDao.save(titular);
+
+        List<Cuenta> cuentas = cuentaDao.obtenerCuentasDelCliente(dni);
+        if (cuentas == null) {
+            throw new CuentaNoEncontradaException("La cuenta no ha sido encontrada en la base de datos");
+        }
+
+        for (Cuenta cuenta : cuentas) {
+            cuentaDao.eliminarCuenta(cuenta.getNumeroCuenta());
+        }
+       
+        clienteDao.eliminarCliente(dni);
+
+
+        //Borrar movimientos
+        //borrar Transferencias
+
+        
     }
 
-    public Cliente buscarClientePorDni(long dni) {
-        Cliente cliente = clienteDao.find(dni, true);
-        if(cliente == null) {
-            throw new IllegalArgumentException("El cliente no existe");
+    public Cliente modificarCliente(ClienteDto clienteDto) throws ErrorGuardarClienteException, ErrorActualizarClienteException, ClienteNoEncontradoException, ErrorArchivoNoEncontradoException,  ErrorEliminarLineaException {
+        Cliente clienteModificado = new Cliente(clienteDto);
+        Cliente  clienteActualizado =clienteDao.actualizarCliente(clienteModificado);
+        if (clienteActualizado == null) {
+            throw new ClienteNoEncontradoException("El cliente no ha sido encontrado en la base de datos");
         }
+        return clienteModificado;
+    }
+
+
+
+    public Cliente obtenerCliente(long dni) throws ErrorArchivoNoEncontradoException, ClienteNoEncontradoException{
+        Cliente cliente = clienteDao.obtenerClientePorDNI(dni);
+        
         return cliente;
+
+    }
+    public List<Cliente> mostrarListaCliente() throws ErrorArchivoNoEncontradoException,ClienteNoEncontradoException {
+        List<Cliente> listaClientes = clienteDao.obtenerListaClientes();
+        if (listaClientes.isEmpty()) {
+            throw new ClienteNoEncontradoException("No se encontraron clientes en la base de datos");
+        }
+        return listaClientes;
+
     }
 }
