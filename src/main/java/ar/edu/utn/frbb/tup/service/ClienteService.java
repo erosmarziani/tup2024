@@ -9,7 +9,7 @@ import ar.edu.utn.frbb.tup.persistence.exception.ErrorActualizarClienteException
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorArchivoNoEncontradoException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorEliminarLineaException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorGuardarClienteException;
-import ar.edu.utn.frbb.tup.persistence.exception.ErrorManejoArchvivoException;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorManejoArchivoException;
 import ar.edu.utn.frbb.tup.persistence.implementation.ClienteDaoImpl;
 import ar.edu.utn.frbb.tup.persistence.implementation.CuentaDaoImpl;
 import ar.edu.utn.frbb.tup.service.exception.ClienteMenorDeEdadException;
@@ -49,7 +49,7 @@ public class ClienteService {
         return cliente;
     }
     
-    public void eliminarCliente(long dni) throws ClienteNoEncontradoException, ErrorArchivoNoEncontradoException, ErrorEliminarLineaException,ErrorManejoArchvivoException, CuentaNoEncontradaException{
+    public void eliminarCliente(long dni) throws ClienteNoEncontradoException, ErrorArchivoNoEncontradoException, ErrorEliminarLineaException,ErrorManejoArchivoException, CuentaNoEncontradaException{
         //Verificar si el cliente existe
         Cliente cliente = clienteDao.obtenerClientePorDNI(dni);
 

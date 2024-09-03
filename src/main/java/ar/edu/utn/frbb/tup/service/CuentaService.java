@@ -40,7 +40,7 @@ public class CuentaService {
     }
 
     public Cuenta eliminarCuenta(long idCuenta)
-            throws ErrorEliminarLineaException, ErrorManejoArchvivoException, CuentaNoEncontradaException {
+            throws ErrorEliminarLineaException, ErrorManejoArchivoException, CuentaNoEncontradaException {
         Cuenta cuenta = cuentaDao.eliminarCuenta(idCuenta);
 
         if (cuenta == null) {

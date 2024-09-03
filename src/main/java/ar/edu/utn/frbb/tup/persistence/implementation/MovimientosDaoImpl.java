@@ -16,7 +16,7 @@ import ar.edu.utn.frbb.tup.model.enums.TipoOperacion;
 import ar.edu.utn.frbb.tup.persistence.*;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorEliminarLineaException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorEscribirArchivoException;
-import ar.edu.utn.frbb.tup.persistence.exception.ErrorManejoArchvivoException;;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorManejoArchivoException;
 
 public class MovimientosDaoImpl implements MovimientosDAO {
     private static final String FILE_PATH = "src" + File.separator + "main" + File.separator + "java" + File.separator
@@ -58,7 +58,7 @@ public class MovimientosDaoImpl implements MovimientosDAO {
     }
 
     @Override
-    public List<Movimiento> obtenerMovimientoPorCuenta(long idCuenta) throws ErrorManejoArchvivoException {
+    public List<Movimiento> obtenerMovimientoPorCuenta(long idCuenta) throws ErrorManejoArchivoException {
         List<Movimiento> movimientos = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
             String line;
@@ -79,17 +79,17 @@ public class MovimientosDaoImpl implements MovimientosDAO {
                 }
             }
         } catch (IOException e) {
-            throw new ErrorManejoArchvivoException("Error al capturar los movimientos");
+            throw new ErrorManejoArchivoException("Error al capturar los movimientos");
         }
 
         return movimientos;
     }
 
     @Override
-    public Movimiento eliminarMovimientoPorID(long idMovimiento) throws ErrorManejoArchvivoException, ErrorEliminarLineaException {
+    public boolean eliminarMovimientoPorId(long idCuenta) throws ErrorManejoArchivoException, ErrorEliminarLineaException {
         File inputFile = new File(FILE_PATH);
         File tempFile = new File(inputFile.getAbsolutePath() + ".tmp");
-        Movimiento movimientoEliminado = null;
+        boolean movimientoEncontrado = false;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
                 BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
@@ -99,6 +99,7 @@ public class MovimientosDaoImpl implements MovimientosDAO {
 
             while ((line = reader.readLine()) != null) {
                 if (isHeader) {
+                    //Copio el encabezado en el archivo temporal
                     writer.write(line);
                     writer.newLine();
                     isHeader = false;
@@ -106,9 +107,10 @@ public class MovimientosDaoImpl implements MovimientosDAO {
                 }
                 String[] campos = line.split(";");
                 if (campos.length >= 5) {
-                    long idActual = Long.parseLong(campos[0]);
-                    if (idActual == idMovimiento) {
-                        movimientoEliminado = parseMovimiento(campos);
+                    long idCuentaActual= Long.parseLong(campos[1]);
+                    if (idCuentaActual == idCuenta) {
+                        movimientoEncontrado = true;
+                       //Cambio el valor del booleano
 
                     } else {
                         writer.write(line);
@@ -121,17 +123,17 @@ public class MovimientosDaoImpl implements MovimientosDAO {
         }
 
         if (!inputFile.delete()) {
-            throw new ErrorManejoArchvivoException("Error al eliminar el archivo original");
+            throw new ErrorManejoArchivoException("Error al eliminar el archivo original");
         }
 
         if (!tempFile.renameTo(inputFile)) {
-            throw new ErrorManejoArchvivoException("Error al renombrar el archivo temporal");
+            throw new ErrorManejoArchivoException("Error al renombrar el archivo temporal");
         }
-        return movimientoEliminado;
+        return movimientoEncontrado;
     }
 
     @Override
-    public List<Movimiento> obtenerMovimientos() throws ErrorManejoArchvivoException {
+    public List<Movimiento> obtenerMovimientos() throws ErrorManejoArchivoException {
         List<Movimiento> listaMovimientos = new ArrayList<>();
         File file = new File(FILE_PATH);
         try(BufferedReader reader = new BufferedReader(new FileReader(file))){
@@ -152,7 +154,7 @@ public class MovimientosDaoImpl implements MovimientosDAO {
                 }
         }
     }catch(Exception e){
-        throw new ErrorManejoArchvivoException("Error al capturar los movimientos");
+        throw new ErrorManejoArchivoException("Error al capturar los movimientos");
     }
     return listaMovimientos;
 

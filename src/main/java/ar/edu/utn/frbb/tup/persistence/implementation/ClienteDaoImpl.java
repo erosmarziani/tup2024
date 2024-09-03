@@ -11,7 +11,7 @@ import ar.edu.utn.frbb.tup.persistence.ClientesDAO;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorArchivoNoEncontradoException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorEliminarLineaException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorGuardarClienteException;
-import ar.edu.utn.frbb.tup.persistence.exception.ErrorManejoArchvivoException;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorManejoArchivoException;
 import ar.edu.utn.frbb.tup.persistence.exception.ClienteNoEncontradoException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorActualizarClienteException;
 
@@ -92,7 +92,7 @@ public class ClienteDaoImpl implements ClientesDAO{
 
 
     @Override
-    public void eliminarCliente(Long dni) throws ErrorEliminarLineaException, ErrorManejoArchvivoException {
+    public void eliminarCliente(Long dni) throws ErrorEliminarLineaException, ErrorManejoArchivoException {
         File inputFile = new File(FILE_PATH);
         //Creo un archivo temporal para guardar los datos y evitar que se borren por error
         File tempFile = new File(inputFile.getAbsolutePath() + ".tmp");
@@ -128,12 +128,12 @@ public class ClienteDaoImpl implements ClientesDAO{
                 }
 
                 if (!inputFile.delete()) {
-                    throw new ErrorManejoArchvivoException("Error al eliminar el archivo original");
+                    throw new ErrorManejoArchivoException("Error al eliminar el archivo original");
                     
                 }
 
                 if (!tempFile.renameTo(inputFile)) {
-                    throw new ErrorManejoArchvivoException("Error al renombrar el archivo temporal");
+                    throw new ErrorManejoArchivoException("Error al renombrar el archivo temporal");
                 }
             };
 

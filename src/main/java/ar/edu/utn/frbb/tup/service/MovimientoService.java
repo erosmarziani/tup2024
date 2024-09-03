@@ -1,17 +1,22 @@
 package ar.edu.utn.frbb.tup.service;
 
-import ar.edu.utn.frbb.tup.exception.CuentaNoEncontradaException;
-import ar.edu.utn.frbb.tup.exception.CuentaSinSaldoException;
-import ar.edu.utn.frbb.tup.exception.MomivientosVaciosException;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.Movimiento;
-import ar.edu.utn.frbb.tup.persistence.CuentaDao;
-import ar.edu.utn.frbb.tup.persistence.MovimientosDao;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorArchivoNoEncontradoException;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorCuentaNoEncontradaException;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorEliminarLineaException;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorEscribirArchivoException;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorGuardarCuentaException;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorManejoArchivoException;
 import ar.edu.utn.frbb.tup.persistence.implementation.CuentaDaoImpl;
 import ar.edu.utn.frbb.tup.persistence.implementation.MovimientosDaoImpl;
 import ar.edu.utn.frbb.tup.service.exception.CuentaInexistenteException;
-import ar.edu.utn.frbb.tup.model.TipoOperacion;
+import ar.edu.utn.frbb.tup.service.exception.CuentaNoEncontradaException;
+import ar.edu.utn.frbb.tup.service.exception.CuentaSinSaldoException;
+import ar.edu.utn.frbb.tup.service.exception.MovimientosVaciosException;
+import ar.edu.utn.frbb.tup.model.enums.TipoOperacion;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -27,59 +32,65 @@ public class MovimientoService {
     @Autowired
     private CuentaDaoImpl cuentaDao;
 
-    public Movimiento realizarDeposito(long idCuenta, double monto) throws CuentaInexistenteException{
+    public Movimiento realizarDeposito(long idCuenta, int monto) throws CuentaInexistenteException,
+            ErrorEscribirArchivoException, ErrorArchivoNoEncontradoException, ErrorCuentaNoEncontradaException,
+            ErrorGuardarCuentaException, ErrorEliminarLineaException, ErrorManejoArchivoException, IOException {
 
         Cuenta cuenta = cuentaDao.obtenerCuentaPorId(idCuenta);
 
         if (cuenta == null) {
             throw new CuentaInexistenteException("El CBU no existe");
         }
-        
-        double nuevoBalance = cuenta.getBalance() + monto;
-        cuentaDao.actualizarBalanceCuenta(idCuenta, nuevoBalance);
 
-        Movimiento movimiento = creaMovimiento(cbu, TipoOperacion.DEPOSITO, monto);
+        int nuevoBalance = cuenta.getBalance() + monto;
+        cuentaDao.actualizarBalance(idCuenta, nuevoBalance);
 
-        movimientosDao.guardarMovimiento(movimiento);
+        Movimiento movimiento = crearMovimiento(idCuenta, LocalDate.now(), nuevoBalance, TipoOperacion.DEBITO);
+
+        movimientosDao.agregarMovimiento(movimiento);
 
         return movimiento;
     }
 
-    public Movimiento realizarRetiro(long cbu, double monto) throws CuentaNoEncontradaException, CuentaSinSaldoException {
-        Cuenta cuenta = cuentaDao.obtenerCuentaPorCBU(cbu);
+    public Movimiento realizarRetiro(long idCuenta, int monto)
+            throws CuentaNoEncontradaException, CuentaSinSaldoException, ErrorCuentaNoEncontradaException, ErrorArchivoNoEncontradoException, IOException, ErrorGuardarCuentaException, ErrorEliminarLineaException, ErrorManejoArchivoException, ErrorEscribirArchivoException {
+        Cuenta cuenta = cuentaDao.obtenerCuentaPorId(idCuenta);
         if (cuenta == null) {
             throw new CuentaNoEncontradaException("Cuenta no encontrada");
         }
         if (cuenta.getBalance() < monto) {
             throw new CuentaSinSaldoException("Saldo insuficiente");
         }
+        int nuevoBalance = cuenta.getBalance() - monto;
+        cuentaDao.actualizarBalance(idCuenta, nuevoBalance);
 
-        Movimiento movimiento = creaMovimiento(cbu, TipoOperacion.RETIRO, monto);
+        Movimiento movimiento = crearMovimiento(idCuenta, LocalDate.now(), nuevoBalance, TipoOperacion.CREDITO);
 
-        movimientosDao.guardarMovimiento(movimiento);
-
-        double nuevoBalance = cuenta.getBalance() - monto;
-        cuentaDao.actualizarBalanceCuenta(cbu, nuevoBalance);
-
+        movimientosDao.agregarMovimiento(movimiento);
         return movimiento;
     }
 
-    public List<Movimiento> obtenerOperacionesPorCBU(long cbu) throws MomivientosVaciosException {
+    public List<Movimiento> obtenerMovimientosPorId(long idCuenta) throws MovimientosVaciosException, ErrorManejoArchivoException {
 
-        List<Movimiento> movimientos =  movimientosDao.obtenerOperacionesPorCBU(cbu);
+        List<Movimiento> movimientos = movimientosDao.obtenerMovimientoPorCuenta(idCuenta);
         if (movimientos.isEmpty()) {
-            throw new MomivientosVaciosException("No se encontraron movimientos");  
+            throw new MovimientosVaciosException("No se encontraron movimientos");
         }
         return movimientos;
     }
 
-    private static Movimiento creaMovimiento( long cbu, TipoOperacion tipoOperacion, double monto) {
+    public void eliminarMovimientosPorID(long idCuenta) throws ErrorManejoArchivoException, ErrorEliminarLineaException, MovimientosVaciosException {
+        boolean movimientoEncontrado = movimientosDao.eliminarMovimientoPorId(idCuenta);
+        if (movimientoEncontrado == false) {
+            throw new MovimientosVaciosException("No se encontraron movimientos");
+        }
 
-        Movimiento movimiento = new Movimiento();
-        movimiento.setCBU(cbu);
-        movimiento.setFechaOperacion(LocalDate.now());
-        movimiento.setTipoOperacion(tipoOperacion);
-        movimiento.setMonto(monto);
+    }
+
+    private static Movimiento crearMovimiento(long idCuenta, LocalDate fechaOperacion, int importe,
+            TipoOperacion tipoOperacion) {
+
+        Movimiento movimiento = new Movimiento(idCuenta, fechaOperacion, importe, tipoOperacion);
         return movimiento;
     }
 
