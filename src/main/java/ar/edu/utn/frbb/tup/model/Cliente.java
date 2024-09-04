@@ -2,6 +2,7 @@ package ar.edu.utn.frbb.tup.model;
 
 import java.time.LocalDate;
 
+
 import ar.edu.utn.frbb.tup.controller.Dto.ClienteDto;
 import ar.edu.utn.frbb.tup.model.enums.TipoPersona;
 
@@ -16,9 +17,16 @@ public class Cliente extends Persona{
     }
 
     public Cliente(ClienteDto clienteDto) {
-        super(clienteDto.getDni(), clienteDto.getApellido(), clienteDto.getNombre(), clienteDto.getFechaNacimiento(),clienteDto.getDireccion(), clienteDto.getTelefono());
-        fechaAlta = LocalDate.now();
-        banco = clienteDto.getBanco();
+        super(
+            Long.parseLong(clienteDto.getDni()),
+             clienteDto.getApellido(),
+              clienteDto.getNombre(),
+               LocalDate.parse(clienteDto.getFechaNacimiento()),
+               clienteDto.getDireccion(),
+                clienteDto.getTelefono());
+        this.tipoPersona = TipoPersona.fromString(clienteDto.getTipoPersona());
+        this.banco = clienteDto.getBanco();
+        this.fechaAlta = LocalDate.now();
     }
 
     public TipoPersona getTipoPersona() {
