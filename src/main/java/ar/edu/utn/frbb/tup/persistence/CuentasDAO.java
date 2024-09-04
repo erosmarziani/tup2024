@@ -11,5 +11,5 @@ public interface CuentasDAO {
     List<Cuenta> obtenerCuentas() throws Exception;
     Cuenta eliminarCuenta(long idCuenta) throws Exception;
     Cuenta actualizarCuenta(Cuenta cuenta) throws Exception;
-    Cuenta actualizarBalance(long numeroCuenta, int nuevoBalance) throws Exception;
+    Cuenta actualizarBalance(long numeroCuenta, double nuevoBalance) throws Exception;
     }

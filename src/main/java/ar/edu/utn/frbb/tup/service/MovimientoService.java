@@ -14,6 +14,7 @@ import ar.edu.utn.frbb.tup.service.exception.CuentaInexistenteException;
 import ar.edu.utn.frbb.tup.service.exception.CuentaNoEncontradaException;
 import ar.edu.utn.frbb.tup.service.exception.CuentaSinSaldoException;
 import ar.edu.utn.frbb.tup.service.exception.MovimientosVaciosException;
+import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 import ar.edu.utn.frbb.tup.model.enums.TipoOperacion;
 
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class MovimientoService {
     @Autowired
     private CuentaDaoImpl cuentaDao;
 
-    public Movimiento realizarDeposito(long idCuenta, int monto) throws CuentaInexistenteException,
+    public Movimiento realizarDeposito(long idCuenta, double monto,TipoMoneda tipoMoneda) throws CuentaInexistenteException,
             ErrorEscribirArchivoException, ErrorArchivoNoEncontradoException, ErrorCuentaNoEncontradaException,
             ErrorGuardarCuentaException, ErrorEliminarLineaException, ErrorManejoArchivoException, IOException {
 
@@ -42,17 +43,17 @@ public class MovimientoService {
             throw new CuentaInexistenteException("El CBU no existe");
         }
 
-        int nuevoBalance = cuenta.getBalance() + monto;
+        double nuevoBalance = cuenta.getBalance() + monto;
         cuentaDao.actualizarBalance(idCuenta, nuevoBalance);
 
-        Movimiento movimiento = crearMovimiento(idCuenta, LocalDate.now(), nuevoBalance, TipoOperacion.DEBITO);
+        Movimiento movimiento = crearMovimiento(idCuenta, LocalDate.now(), nuevoBalance, TipoOperacion.DEBITO, tipoMoneda);
 
         movimientosDao.agregarMovimiento(movimiento);
 
         return movimiento;
     }
 
-    public Movimiento realizarRetiro(long idCuenta, int monto)
+    public Movimiento realizarRetiro(long idCuenta, double monto, TipoMoneda tipoMoneda)
             throws CuentaNoEncontradaException, CuentaSinSaldoException, ErrorCuentaNoEncontradaException, ErrorArchivoNoEncontradoException, IOException, ErrorGuardarCuentaException, ErrorEliminarLineaException, ErrorManejoArchivoException, ErrorEscribirArchivoException {
         Cuenta cuenta = cuentaDao.obtenerCuentaPorId(idCuenta);
         if (cuenta == null) {
@@ -61,10 +62,10 @@ public class MovimientoService {
         if (cuenta.getBalance() < monto) {
             throw new CuentaSinSaldoException("Saldo insuficiente");
         }
-        int nuevoBalance = cuenta.getBalance() - monto;
+        double nuevoBalance = cuenta.getBalance() - monto;
         cuentaDao.actualizarBalance(idCuenta, nuevoBalance);
 
-        Movimiento movimiento = crearMovimiento(idCuenta, LocalDate.now(), nuevoBalance, TipoOperacion.CREDITO);
+        Movimiento movimiento = crearMovimiento(idCuenta, LocalDate.now(), nuevoBalance, TipoOperacion.CREDITO,tipoMoneda);
 
         movimientosDao.agregarMovimiento(movimiento);
         return movimiento;
@@ -87,10 +88,10 @@ public class MovimientoService {
 
     }
 
-    private static Movimiento crearMovimiento(long idCuenta, LocalDate fechaOperacion, int importe,
-            TipoOperacion tipoOperacion) {
+    private static Movimiento crearMovimiento(long idCuenta, LocalDate fechaOperacion, double importe,
+            TipoOperacion tipoOperacion, TipoMoneda tipoMoneda) {
 
-        Movimiento movimiento = new Movimiento(idCuenta, fechaOperacion, importe, tipoOperacion);
+        Movimiento movimiento = new Movimiento(idCuenta, fechaOperacion, importe, tipoOperacion,tipoMoneda);
         return movimiento;
     }
 

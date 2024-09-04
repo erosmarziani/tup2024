@@ -236,7 +236,7 @@ public class CuentaDaoImpl implements CuentasDAO {
 
     }
     @Override
-    public Cuenta actualizarBalance(long numeroCuenta, int nuevoBalance) throws ErrorArchivoNoEncontradoException, ErrorCuentaNoEncontradaException, ErrorGuardarCuentaException, ErrorEliminarLineaException, ErrorManejoArchivoException {
+    public Cuenta actualizarBalance(long numeroCuenta, double nuevoBalance) throws ErrorArchivoNoEncontradoException, ErrorCuentaNoEncontradaException, ErrorGuardarCuentaException, ErrorEliminarLineaException, ErrorManejoArchivoException {
         List<Cuenta> cuentas = obtenerCuentas();
         Cuenta cuentaActualizada = null;
         boolean cuentaEncontrada = false;

@@ -1,8 +1,8 @@
 package ar.edu.utn.frbb.tup.model.enums;
 
 public enum TipoMoneda {
-    PESOS("ARS"),
-    DOLARES("USD");
+    ARS("PESOS"),
+    USD("DOLARES");
 
     private final String descripcion;
 

@@ -11,8 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.utn.frbb.tup.model.Movimiento;
-
-import ar.edu.utn.frbb.tup.model.enums.TipoOperacion;
+import ar.edu.utn.frbb.tup.model.enums.*;
 import ar.edu.utn.frbb.tup.persistence.*;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorEliminarLineaException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorEscribirArchivoException;
@@ -31,7 +30,8 @@ public class MovimientosDaoImpl implements MovimientosDAO {
             Long.parseLong(campos[1]),
             LocalDate.parse(campos[2]),
             Integer.parseInt(campos[3]),
-            TipoOperacion.valueOf(campos[4]));
+            TipoOperacion.valueOf(campos[4]),
+            TipoMoneda.valueOf(campos[5]));
             return movimiento;
     }
 

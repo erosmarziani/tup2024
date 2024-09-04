@@ -11,13 +11,13 @@ import ar.edu.utn.frbb.tup.model.exception.NoAlcanzaException;
 public class Cuenta {
     private long idCuenta;
     LocalDate fechaCreacion;
-    int balance;
+    double balance;
     TipoCuenta tipoCuenta;
     long idTitular;
     TipoMoneda moneda;
 
 
-    public Cuenta(long idCuenta,LocalDate fechaCreacion,int balance,TipoCuenta tipoCuenta, long titular, TipoMoneda moneda) {
+    public Cuenta(long idCuenta,LocalDate fechaCreacion,double balance,TipoCuenta tipoCuenta, long titular, TipoMoneda moneda) {
         this.idCuenta = idCuenta;
         this.fechaCreacion = fechaCreacion;
         this.balance = balance;
@@ -68,11 +68,11 @@ public class Cuenta {
         return this;
     }
 
-    public int getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public Cuenta setBalance(int balance) {
+    public Cuenta setBalance(double balance) {
         this.balance = balance;
         return this;
     }
