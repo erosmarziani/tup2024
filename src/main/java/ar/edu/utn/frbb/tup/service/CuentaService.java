@@ -51,14 +51,14 @@ public class CuentaService {
         return cuenta;
     }
 
-    public List<Cuenta> obtenerCuentasPorId(Long id)
+    public List<Cuenta> obtenerCuentasPorIdCliente(Long idCliente)
             throws ErrorArchivoNoEncontradoException, ClienteNoEncontradoException {
-        Cliente cliente = clienteDao.obtenerClientePorDNI(id);
+        Cliente cliente = clienteDao.obtenerClientePorDNI(idCliente);
         if (cliente == null) {
             throw new ClienteNoEncontradoException("El cliente no ha sido encontrado en la base de datos");
         }
 
-        List<Cuenta> cuentas = cuentaDao.obtenerCuentasDelCliente(id);
+        List<Cuenta> cuentas = cuentaDao.obtenerCuentasDelCliente(idCliente);
         return cuentas;
     }
 

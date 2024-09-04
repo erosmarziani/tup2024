@@ -36,13 +36,12 @@ public class TransferenciaService {
 
     public void validacionTransferencia(long idCuentaOrigen, long idCuentaDestino, double monto, TipoMoneda tipoMoneda) throws ErrorCuentaNoEncontradaException, ErrorArchivoNoEncontradoException, IOException, CuentaInexistenteException, TransferenciaRechazadaException {
 
-        Cuenta cuentaOrigen = cuentaDao.obtenerCuentaPorId(idCuentaDestino);
+        Cuenta cuentaOrigen = cuentaDao.obtenerCuentaPorId(idCuentaOrigen);
         Cuenta cuentaDestino = cuentaDao.obtenerCuentaPorId(idCuentaDestino);
 
         // Verifico que las dos cuentas existan
         if (cuentaOrigen == null && cuentaDestino == null) {
-            throw new CuentaInexistenteException(
-                    "No se ha encontrado la cuenta origen y la cuenta destino en la base de datos");
+            throw new CuentaInexistenteException("No se ha encontrado la cuenta origen y la cuenta destino en la base de datos");
         } else if (cuentaOrigen == null) {
             throw new CuentaInexistenteException("No se ha encontrado la cuenta origen en la base de datos");
         } else if (cuentaDestino == null) {
@@ -57,8 +56,7 @@ public class TransferenciaService {
             throw new IllegalArgumentException("No se puede realizar la transferencia, saldo insuficiente");
         }
 
-        // Si las cuentas no pertenecen al mismo banco se consulta a un servicio que da
-        // una respuesta aleatoria
+        // Si las cuentas no pertenecen al mismo banco se consulta a un servicio que da una respuesta aleatoria
         if (clienteOrigen.getBanco() != clienteDestino.getBanco()) {
             if (banelcoService.transferir() == false) {
                 throw new TransferenciaRechazadaException("La transferencia entre los bancos fue rechazada");
@@ -96,7 +94,7 @@ public class TransferenciaService {
         new Movimiento(
             idMovimiento,
             cuentaDestino.getTitular(),
-            LocalDate.now(),
+            LocalDate.now()x,
             montoTotal,
             TipoOperacion.CREDITO,
             cuentaDestino.getMoneda())
