@@ -9,8 +9,10 @@ import ar.edu.utn.frbb.tup.persistence.exception.ErrorActualizarClienteException
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorArchivoNoEncontradoException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorEliminarLineaException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorGuardarClienteException;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorManejoArchivoException;
 import ar.edu.utn.frbb.tup.service.ClienteService;
 import ar.edu.utn.frbb.tup.service.exception.ClienteMenorDeEdadException;
+import ar.edu.utn.frbb.tup.service.exception.CuentaNoEncontradaException;
 
 import java.util.List;
 
@@ -45,10 +47,15 @@ public class ClienteController {
         return ResponseEntity.ok(clienteService.darDeAltaCliente(clienteDto));
     }
 
-    @PutMapping
-    public ResponseEntity<Cliente> modificarCliente(@RequestBody ClienteDto clienteDto) throws ErrorGuardarClienteException, ErrorActualizarClienteException, ClienteNoEncontradoException, ErrorArchivoNoEncontradoException, ErrorEliminarLineaException{
+    @PutMapping("/modificar/{dni}")
+    public ResponseEntity<Cliente> modificarCliente(@RequestBody ClienteDto clienteDto) throws ErrorGuardarClienteException, ErrorActualizarClienteException, ClienteNoEncontradoException, ErrorArchivoNoEncontradoException, ErrorEliminarLineaException, ErrorManejoArchivoException  {
         clienteValidator.validarCliente(clienteDto);
         return ResponseEntity.ok(clienteService.modificarCliente(clienteDto));
+    }
+
+    @DeleteMapping("/eliminar/{dni}")
+    public ResponseEntity<Cliente> deleteCliente(@PathVariable long dni) throws ClienteNoEncontradoException, ErrorArchivoNoEncontradoException, ErrorEliminarLineaException, ErrorManejoArchivoException, CuentaNoEncontradaException{
+        return  ResponseEntity.ok(clienteService.eliminarCliente(dni));
     }
 
 

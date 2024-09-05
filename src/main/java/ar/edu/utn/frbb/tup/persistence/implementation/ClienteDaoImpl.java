@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.stereotype.Repository;
+
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.enums.*;
 import ar.edu.utn.frbb.tup.persistence.ClientesDAO;
@@ -13,51 +15,42 @@ import ar.edu.utn.frbb.tup.persistence.exception.ErrorEliminarLineaException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorGuardarClienteException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorManejoArchivoException;
 import ar.edu.utn.frbb.tup.persistence.exception.ClienteNoEncontradoException;
-import ar.edu.utn.frbb.tup.persistence.exception.ErrorActualizarClienteException;
 
-
+@Repository
 public class ClienteDaoImpl implements ClientesDAO{
 
-    private static final String FILE_PATH = "src" + File.separator + "main" + File.separator + "java" + File.separator + "ar" + File.separator + "edu" + File.separator + "utn" + File.separator + "frbb" + File.separator + "tup" + File.separator + "persistence" + File.separator + "resources" + File.separator + "clientes.txt";
+    private static final String FILE_PATH = "tup2024\\src\\main\\java\\ar\\edu\\utn\\frbb\\tup\\persistence\\resources\\clientes.txt";
    
    
     @Override
     public void guardarCliente(Cliente cliente) throws ErrorGuardarClienteException {
         File file = new File(FILE_PATH); //Creacion de archivo mediante la clase File
-        boolean isNewFile = !file.exists();
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))){
-            if(isNewFile){
-                writer.write("DNI;Nombre;Apellido;Fecha_Alta;Tipo_Persona;Banco;Fecha_Nacimiento;Direccion;Telefono");
+            if(file.length() == 0){
+                writer.write("DNI;Nombre;Apellido;Fecha_Alta;Tipo_Persona;Fecha_Nacimiento;Direccion;Telefono");
                 writer.newLine();
             }
-            writer.write(cliente.getDni() + ";" + cliente.getNombre() + ";" + cliente.getApellido() + ";" + cliente.getFechaAlta() + ";" + cliente.getTipoPersona() + ";" + cliente.getBanco() + ";" + cliente.getFechaNacimiento() + ";" + cliente.getDireccion() + ";" + cliente.getTelefono());
+            writer.write(cliente.getDni() + ";" +    cliente.getNombre() + ";" + cliente.getApellido() + ";" + cliente.getFechaAlta() + ";" + cliente.getTipoPersona() + ";" + cliente.getFechaNacimiento() + ";" + cliente.getDireccion() + ";" + cliente.getTelefono());
             writer.newLine();
         }catch( IOException e ){
             throw new ErrorGuardarClienteException("Error al guardar el cliente en el archivo: " , e);
         }   
-        
-
-
-        
+                
     }
 
-    public Cliente parsearCliente(String[] datos){
+    public Cliente parsearCliente(String[] datos) {
         Cliente cliente = new Cliente();
-
+    
         cliente.setDni(Long.parseLong(datos[0]));
         cliente.setNombre(datos[1]);
         cliente.setApellido(datos[2]);
-        cliente.setDireccion(datos[3]);
-        cliente.setFechaNacimiento(LocalDate.parse(datos[4]));
-        cliente.setTipoPersona(TipoPersona.valueOf(datos[5]));
-        cliente.setBanco(datos[6]);
-        cliente.setFechaAlta(LocalDate.parse(datos[7]));
-        cliente.setDireccion(datos[8]);
-        cliente.setTelefono(datos[9]);
-
+        cliente.setFechaNacimiento(LocalDate.parse(datos[3]));
+        cliente.setTipoPersona(TipoPersona.fromString(datos[4]));
+        cliente.setFechaAlta(LocalDate.parse(datos[5]));
+        cliente.setDireccion(datos[6]);
+        cliente.setTelefono(datos[7]);
+    
         return cliente;
-
-        
     }
 
 
@@ -73,13 +66,15 @@ public class ClienteDaoImpl implements ClientesDAO{
                 }
             
                 String[] datos = line.split(";");
-                if (datos.length >= 7 ) {
+                if (datos.length >= 8 ) {
                     if (dni == Long.parseLong(datos[0])) {   //Comprueba que el dni exista en la base de datos
                         Cliente cliente = new Cliente();
                         cliente = parsearCliente(datos);
                         return cliente;
                     }               
                 }    
+
+
 
     }}catch(FileNotFoundException e){
         throw new ErrorArchivoNoEncontradoException("Archivo no encontrado en la ruta especificada", e);
@@ -111,7 +106,7 @@ public class ClienteDaoImpl implements ClientesDAO{
                         continue;
                   }
                   String[] campos = line.split(";"); //divide cuando encuentra un caracter ;
-                  if (campos.length == 9) {
+                  if (campos.length == 8) {
                         Long dniActual = Long.parseLong(campos[0]); 
                         if (!dniActual.equals(dni)) {
                             writer.write(line); // Si el dni no coincide con el que pasamos como parametro se escribe la linea
@@ -159,7 +154,7 @@ public List<Cliente> obtenerListaClientes() throws ErrorArchivoNoEncontradoExcep
             }
 
             String[] datos = line.split(";");
-            if (datos.length >= 7) {
+            if (datos.length >= 8) {
                 Cliente cliente = new Cliente();
                     cliente = parsearCliente(datos);
                     clientesEncontrados.add(cliente);
@@ -176,7 +171,7 @@ public List<Cliente> obtenerListaClientes() throws ErrorArchivoNoEncontradoExcep
 }
 
     @Override
-    public Cliente actualizarCliente(Cliente cliente) throws ErrorGuardarClienteException, ClienteNoEncontradoException , ErrorEliminarLineaException, ErrorArchivoNoEncontradoException{
+    public Cliente actualizarCliente(Cliente cliente) throws ErrorGuardarClienteException, ClienteNoEncontradoException , ErrorEliminarLineaException, ErrorArchivoNoEncontradoException, ErrorManejoArchivoException{
         List<Cliente> clientes = obtenerListaClientes();
 
         boolean clienteEncontrado = false;
@@ -188,21 +183,20 @@ public List<Cliente> obtenerListaClientes() throws ErrorArchivoNoEncontradoExcep
             }
 
     }
-    if (clienteEncontrado) {
+    if (!clienteEncontrado) {
+        return null;
+    }
         
     try{
         eliminarCliente(cliente.getDni()); //Elimina el cliente existente
         guardarCliente(cliente);  //Guardo el cliente con los nuevos datos
 
-    }catch (Exception e) {
-        throw new ErrorEliminarLineaException("Erorr al eliminar el cliente: " + e.getMessage());
-
-    }catch (IOError e){
+    }catch (ErrorGuardarClienteException  e){
         throw new ErrorGuardarClienteException("Error al guardar el cliente: " ,e);
+    }catch (ErrorEliminarLineaException e) {
+        throw new ErrorEliminarLineaException("Erorr al eliminar el cliente: " + e.getMessage());
     }
+
     return cliente;
 }
-
-    return null;
-
-    }}
+    }

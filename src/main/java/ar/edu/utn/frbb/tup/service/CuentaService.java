@@ -4,7 +4,6 @@ import ar.edu.utn.frbb.tup.controller.Dto.CuentaDto;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.enums.*;
-import ar.edu.utn.frbb.tup.model.exception.*;
 import ar.edu.utn.frbb.tup.persistence.exception.*;
 import ar.edu.utn.frbb.tup.persistence.implementation.ClienteDaoImpl;
 import ar.edu.utn.frbb.tup.persistence.implementation.CuentaDaoImpl;
@@ -24,7 +23,7 @@ public class CuentaService {
 
     @Autowired
     private ClienteDaoImpl clienteDao;
-
+    
     public Cuenta altaCuenta(CuentaDto cuentaDto)
             throws ErrorArchivoNoEncontradoException, ClienteNoEncontradoException, ErrorGuardarCuentaException {
         Cuenta cuenta = new Cuenta(Long.parseLong(cuentaDto.getIdCuenta()), LocalDate.now(), 0,
@@ -39,12 +38,12 @@ public class CuentaService {
 
     }
 
-    public Cuenta eliminarCuenta(long idCuenta)
+    public Cuenta eliminarCuentasCliente(long idCliente)
             throws ErrorEliminarLineaException, ErrorManejoArchivoException, CuentaNoEncontradaException {
-        Cuenta cuenta = cuentaDao.eliminarCuenta(idCuenta);
+        Cuenta cuenta = cuentaDao.eliminarCuenta(idCliente);
 
         if (cuenta == null) {
-            throw new CuentaNoEncontradaException("La cuenta no ha sido encontrada en la base de datos.");
+            throw new CuentaNoEncontradaException("El cliente no tiene cuentas asociadas en la base de datos.");
 
         }
         // Borrar movimientos y transferencias
@@ -70,5 +69,14 @@ public class CuentaService {
         }
         return cuentas;
 
+    }
+
+    public Cuenta actualizarCuenta(CuentaDto cuentaDto) throws CuentaNoEncontradaException, ErrorActualizarCuentaException, ErrorGuardarCuentaException, ErrorArchivoNoEncontradoException, ErrorCuentaNoEncontradaException  {
+        Cuenta cuentaModificada = new Cuenta(cuentaDto);
+        Cuenta cuentaExistente = cuentaDao.actualizarCuenta(cuentaModificada);
+        if (cuentaExistente == null)  {
+            throw new CuentaNoEncontradaException("La cuenta no ha sido encontrada en la base de datos");
+        }
+        return cuentaModificada;
     }
 }

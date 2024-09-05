@@ -1,0 +1,2 @@
+DNI;Nombre;Apellido;Fecha_Alta;Tipo_Persona;Banco;Fecha_Nacimiento;Direccion;Telefono
+12345644;Mateo;Blanco;2024-09-05;PERSONA_JURIDICA;2002-03-04;11 de abril;2915348315

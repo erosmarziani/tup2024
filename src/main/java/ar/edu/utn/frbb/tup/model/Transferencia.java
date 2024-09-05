@@ -2,8 +2,7 @@ package ar.edu.utn.frbb.tup.model;
 
 import java.time.LocalDate;
 
-import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
-import ar.edu.utn.frbb.tup.model.enums.TipoOperacion;
+import ar.edu.utn.frbb.tup.model.enums.*;
 
 public class Transferencia  {
 
@@ -11,17 +10,16 @@ public class Transferencia  {
     private long idDestino;
     private LocalDate fechaOperacion;
     private double monto;
-    private TipoOperacion tipoOperacion;
     private TipoMoneda tipoMoneda;
+    private ResultadoTransferencia ResultadoTransferencia;
 
-    public Transferencia(long idOrigen,long idDestino,LocalDate fechaOperacion, double importe, TipoMoneda moneda, TipoOperacion operacion) {
+    public Transferencia(long idOrigen,long idDestino,LocalDate fechaOperacion, double importe, TipoMoneda moneda,ResultadoTransferencia resultadoTransferencia) {
         this.idOrigen = idOrigen;
         this.idDestino = idDestino;
         this.fechaOperacion = fechaOperacion;
         this.monto = importe;
-        this.tipoOperacion = operacion;
         this.tipoMoneda = moneda;
-
+        this.ResultadoTransferencia = resultadoTransferencia;
 
     }
     public LocalDate getFechaOperacion() {
@@ -36,12 +34,6 @@ public class Transferencia  {
     public void setMonto(double monto) {
         this.monto = monto;
     }
-    public TipoOperacion getTipoOperacion() {
-        return tipoOperacion;
-    }
-    public void setTipoOperacion(TipoOperacion tipoOperacion) {
-        this.tipoOperacion = tipoOperacion;
-    }
     public TipoMoneda getTipoMoneda() {
         return tipoMoneda;
     }
@@ -54,7 +46,12 @@ public class Transferencia  {
     public void setIdOrigen(long idOrigen) {
         this.idOrigen = idOrigen;
     }
-    
+    public void setResultado(ResultadoTransferencia resultado) {
+        this.ResultadoTransferencia = resultado;
+    }
+    public ResultadoTransferencia getResultadoTransferencia() {
+        return ResultadoTransferencia;
+    }
 
     public long getIdDestino() {
         return idDestino;

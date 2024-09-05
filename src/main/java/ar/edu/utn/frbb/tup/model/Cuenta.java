@@ -3,10 +3,8 @@ package ar.edu.utn.frbb.tup.model;
 import java.time.LocalDate;
 import java.util.Random;
 
+import ar.edu.utn.frbb.tup.controller.Dto.CuentaDto;
 import ar.edu.utn.frbb.tup.model.enums.*;
-import ar.edu.utn.frbb.tup.model.exception.CantidadNegativaException;
-
-import ar.edu.utn.frbb.tup.model.exception.NoAlcanzaException;
 
 public class Cuenta {
     private long idCuenta;
@@ -16,8 +14,25 @@ public class Cuenta {
     long idTitular;
     TipoMoneda moneda;
 
+    public Cuenta(CuentaDto cuentaDto) {
+        this.idCuenta = Long.parseLong(cuentaDto.getDniTitular()); //
+        this.tipoCuenta = TipoCuenta.valueOf(cuentaDto.getTipoCuenta()); //
+        this.idTitular = Long.parseLong(cuentaDto.getDniTitular()); //
+        this.moneda = TipoMoneda.valueOf(cuentaDto.getMoneda()); //
+        if (cuentaDto.getBalance() == null) {
+            this.balance = 0; //
+        } else {
+            this.balance = Double.parseDouble(cuentaDto.getBalance());
+        }
+        if (cuentaDto.getFechaAlta() == null) {
+            this.fechaCreacion = LocalDate.now();
+        } else {
+            this.fechaCreacion = LocalDate.parse(cuentaDto.getFechaAlta());
+        }
+    }
 
-    public Cuenta(long idCuenta,LocalDate fechaCreacion,double balance,TipoCuenta tipoCuenta, long titular, TipoMoneda moneda) {
+    public Cuenta(long idCuenta, LocalDate fechaCreacion, double balance, TipoCuenta tipoCuenta, long titular,
+            TipoMoneda moneda) {
         this.idCuenta = idCuenta;
         this.fechaCreacion = fechaCreacion;
         this.balance = balance;
@@ -25,6 +40,7 @@ public class Cuenta {
         this.idTitular = titular;
         this.moneda = moneda;
     }
+
     public Cuenta() {
         this.idCuenta = new Random().nextLong();
         this.balance = 0;
@@ -38,7 +54,6 @@ public class Cuenta {
     public void setTitular(long idTitular) {
         this.idTitular = idTitular;
     }
-
 
     public TipoCuenta getTipoCuenta() {
         return tipoCuenta;
@@ -58,7 +73,6 @@ public class Cuenta {
         return this;
     }
 
-
     public LocalDate getFechaCreacion() {
         return fechaCreacion;
     }
@@ -77,17 +91,6 @@ public class Cuenta {
         return this;
     }
 
-    public void debitarDeCuenta(int cantidadADebitar) throws NoAlcanzaException, CantidadNegativaException {
-        if (cantidadADebitar < 0) {
-            throw new CantidadNegativaException();
-        }
-
-        if (balance < cantidadADebitar) {
-            throw new NoAlcanzaException();
-        }
-        this.balance = this.balance - cantidadADebitar;
-    }
-
     public void setNumeroCuenta(long numeroCuenta) {
         this.idCuenta = numeroCuenta;
     }
@@ -99,6 +102,5 @@ public class Cuenta {
     public long getNumeroCuenta() {
         return idCuenta;
     }
-
 
 }

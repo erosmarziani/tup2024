@@ -9,7 +9,6 @@ import ar.edu.utn.frbb.tup.model.enums.TipoPersona;
 public class Cliente extends Persona{
 
     private TipoPersona tipoPersona;
-    private String banco;
     private LocalDate fechaAlta;
 
     public Cliente() {
@@ -25,7 +24,6 @@ public class Cliente extends Persona{
                clienteDto.getDireccion(),
                 clienteDto.getTelefono());
         this.tipoPersona = TipoPersona.fromString(clienteDto.getTipoPersona());
-        this.banco = clienteDto.getBanco();
         this.fechaAlta = LocalDate.now();
     }
 
@@ -37,14 +35,7 @@ public class Cliente extends Persona{
         this.tipoPersona = tipoPersona;
     }
 
-    public String getBanco() {
-        return banco;
-    }
-
-    public void setBanco(String banco) {
-        this.banco = banco;
-    }
-
+   
     public LocalDate getFechaAlta() {
         return fechaAlta;
     }

@@ -7,6 +7,8 @@ public class CuentaDto {
     private String dniTitular;
     private String tipoCuenta;
     private String moneda;
+    private String fechaAlta;
+    private String balance;
 
 
     public String getIdCuenta() {
@@ -33,4 +35,17 @@ public class CuentaDto {
     public void setMoneda(String moneda) {
         this.moneda = moneda;
     }
+    public String getFechaAlta() {
+        return fechaAlta;
+    }
+    public void setFechaAlta(String fechaAlta) {
+        this.fechaAlta = fechaAlta;
+    }
+    public String getBalance() {
+        return balance;
+    }
+    public void setBalance(String balance) {
+        this.balance = balance;
+    }
+
 }

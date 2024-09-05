@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.stereotype.Repository;
+
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.enums.*;
@@ -22,17 +24,17 @@ import ar.edu.utn.frbb.tup.persistence.exception.ErrorEliminarLineaException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorGuardarCuentaException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorManejoArchivoException;
 
+
+@Repository
 public class CuentaDaoImpl implements CuentasDAO {
-    private static final String FILE_PATH = "src" + File.separator + "main" + File.separator + "java" + File.separator
-            + "ar" + File.separator + "edu" + File.separator + "utn" + File.separator + "frbb" + File.separator + "tup"
-            + File.separator + "persistence" + File.separator + "resources" + File.separator + "cuentas.txt";
+    private static final String FILE_PATH = "tup2024\\src\\main\\java\\ar\\edu\\utn\\frbb\\tup\\persistence\\resources\\cuentas.txt";
 
     public Cuenta parsearCuenta(String[] campos) {
         Cuenta cuenta = new Cuenta();
 
         cuenta.setNumeroCuenta(Long.parseLong(campos[0]));
         cuenta.setFechaCreacion(LocalDate.parse(campos[1]));
-        cuenta.setBalance(Integer.parseInt(campos[2]));
+        cuenta.setBalance(Double.valueOf(campos[2]));
         cuenta.setTipoCuenta(TipoCuenta.valueOf(campos[3]));
         cuenta.setTitular(Long.parseLong(campos[4]));
         cuenta.setMoneda(TipoMoneda.valueOf(campos[5]));
@@ -43,10 +45,9 @@ public class CuentaDaoImpl implements CuentasDAO {
     @Override
     public void guardarCuenta(Cuenta cuenta) throws ErrorGuardarCuentaException {
         File file = new File(FILE_PATH);
-        boolean isNewFile = !file.exists();
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-            if (isNewFile) {
+            if (file.length() == 0) {
                 writer.write("ID_CUENTA,FECHA_CREACION,BALANCE,TIPO_CUENTA,TITULAR,MONEDA");
                 writer.newLine();
             }
@@ -105,7 +106,7 @@ public class CuentaDaoImpl implements CuentasDAO {
     }
 
     @Override
-    public Cuenta eliminarCuenta(long cuentaID) throws ErrorEliminarLineaException, ErrorManejoArchivoException {
+    public Cuenta eliminarCuenta(long clienteID) throws ErrorEliminarLineaException, ErrorManejoArchivoException {
         File inputFile = new File(FILE_PATH);
         File tempFile = new File(inputFile.getAbsolutePath() + ".tmp");
         Cuenta cuentaEliminada = null;
@@ -125,8 +126,8 @@ public class CuentaDaoImpl implements CuentasDAO {
                 }
                 String[] campos = line.split(";");
                 if (campos.length >= 6) {
-                    long idActual = Long.parseLong(campos[0]);
-                    if (idActual == cuentaID) {
+                    long idActual = Long.parseLong(campos[5]);
+                    if (idActual == clienteID) {
                         cuentaEliminada = parsearCuenta(campos);
 
                     } else {

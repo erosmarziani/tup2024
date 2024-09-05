@@ -1,6 +1,6 @@
 package ar.edu.utn.frbb.tup.controller.handler;
 
-import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -11,32 +11,34 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
+
 @ControllerAdvice
 public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value
-            = {TipoCuentaAlreadyExistsException.class, IllegalArgumentException.class})
+            = {ClienteAlreadyExistsException.class, IllegalArgumentException.class})
+    protected ResponseEntity<Object> handleBadRequest( 
+            Exception ex, WebRequest request) {
+        String exceptionMessage = ex.getMessage();
+        CustomApiError error = new CustomApiError();
+        error.setErrorCode(400);
+        error.setErrorMessage(exceptionMessage);
+        return handleExceptionInternal(ex, error,
+                new HttpHeaders(), HttpStatus.BAD_REQUEST, request); 
+    }
+
+    @ExceptionHandler(value
+            = {})
     protected ResponseEntity<Object> handleMateriaNotFound(
             Exception ex, WebRequest request) {
         String exceptionMessage = ex.getMessage();
         CustomApiError error = new CustomApiError();
-        error.setErrorMessage(exceptionMessage);
-        return handleExceptionInternal(ex, error,
-                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-    }
-
-    @ExceptionHandler(value
-            = { IllegalStateException.class })
-    protected ResponseEntity<Object> handleConflict(
-            RuntimeException ex, WebRequest request) {
-        String exceptionMessage = ex.getMessage();
-        CustomApiError error = new CustomApiError();
-        error.setErrorCode(1234);
+        error.setErrorCode(404);
         error.setErrorMessage(exceptionMessage);
         return handleExceptionInternal(ex, error,
                 new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
-
 
 
     @Override

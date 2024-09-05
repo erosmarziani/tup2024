@@ -37,7 +37,7 @@ public class ClienteService {
         Cliente cliente = new Cliente(clienteDto);
 
         Cliente clienteEcontrado = clienteDao.obtenerClientePorDNI(cliente.getDni());
-        if (clienteEcontrado != null) {
+        if (clienteEcontrado.getDni() == Long.parseLong(clienteDto.getDni())) {
             throw new ClienteAlreadyExistsException("Ya existe un cliente con DNI " + cliente.getDni());
         }
 
@@ -49,7 +49,7 @@ public class ClienteService {
         return cliente;
     }
     
-    public void eliminarCliente(long dni) throws ClienteNoEncontradoException, ErrorArchivoNoEncontradoException, ErrorEliminarLineaException,ErrorManejoArchivoException, CuentaNoEncontradaException{
+    public Cliente eliminarCliente(long dni) throws ClienteNoEncontradoException, ErrorArchivoNoEncontradoException, ErrorEliminarLineaException,ErrorManejoArchivoException, CuentaNoEncontradaException{
         //Verificar si el cliente existe
         Cliente cliente = clienteDao.obtenerClientePorDNI(dni);
 
@@ -67,21 +67,22 @@ public class ClienteService {
         }
        
         clienteDao.eliminarCliente(dni);
+        cuentaDao.eliminarCuenta(dni);
 
-
-        //Borrar movimientos
+        return cliente;
+        
         //borrar Transferencias
 
         
     }
 
-    public Cliente modificarCliente(ClienteDto clienteDto) throws ErrorGuardarClienteException, ErrorActualizarClienteException, ClienteNoEncontradoException, ErrorArchivoNoEncontradoException,  ErrorEliminarLineaException {
+    public Cliente modificarCliente(ClienteDto clienteDto) throws ErrorGuardarClienteException, ErrorActualizarClienteException, ClienteNoEncontradoException, ErrorArchivoNoEncontradoException,  ErrorEliminarLineaException, ErrorManejoArchivoException {
         Cliente clienteModificado = new Cliente(clienteDto);
-        Cliente  clienteActualizado =clienteDao.actualizarCliente(clienteModificado);
+        Cliente  clienteActualizado = clienteDao.actualizarCliente(clienteModificado);
         if (clienteActualizado == null) {
             throw new ClienteNoEncontradoException("El cliente no ha sido encontrado en la base de datos");
         }
-        return clienteModificado;
+        return clienteActualizado;
     }
 
 

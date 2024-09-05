@@ -16,10 +16,12 @@ import ar.edu.utn.frbb.tup.controller.Dto.CuentaDto;
 import ar.edu.utn.frbb.tup.controller.validator.CuentaValidator;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.persistence.exception.ClienteNoEncontradoException;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorActualizarCuentaException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorArchivoNoEncontradoException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorCuentaNoEncontradaException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorGuardarCuentaException;
 import ar.edu.utn.frbb.tup.service.CuentaService;
+import ar.edu.utn.frbb.tup.service.exception.CuentaNoEncontradaException;
 import ar.edu.utn.frbb.tup.service.exception.CuentasInexistentesException;
 
 @RestController
@@ -27,10 +29,10 @@ import ar.edu.utn.frbb.tup.service.exception.CuentasInexistentesException;
 public class CuentaController {
     
     @Autowired
-    CuentaService cuentaService;
+    private CuentaService cuentaService;
 
     @Autowired
-    CuentaValidator cuentaValidator;
+    private CuentaValidator cuentaValidator;
 
     @GetMapping
     public ResponseEntity<List<Cuenta>> getCuentas() throws ErrorArchivoNoEncontradoException, ErrorCuentaNoEncontradaException, CuentasInexistentesException{
@@ -48,10 +50,11 @@ public class CuentaController {
         return ResponseEntity.ok(cuentaService.altaCuenta(cuentaDto));
     }
 
-    @PutMapping
-    public ResponseEntity<Cuenta> modificarCuenta(@RequestBody CuentaDto cuentaDto) throws ErrorArchivoNoEncontradoException, ClienteNoEncontradoException, ErrorCuentaNoEncontradaException, ErrorGuardarCuentaException{
+    @PutMapping("/modificar")
+    public ResponseEntity<Cuenta> modificarCuenta(@RequestBody CuentaDto cuentaDto) throws ErrorArchivoNoEncontradoException, ClienteNoEncontradoException, ErrorCuentaNoEncontradaException, ErrorGuardarCuentaException, CuentaNoEncontradaException, ErrorActualizarCuentaException{
         cuentaValidator.validarCuenta(cuentaDto);
-        return ResponseEntity.ok(cuentaService.(cuentaDto));
-    }
+        return ResponseEntity.ok(cuentaService.actualizarCuenta(cuentaDto));
+    } 
+
 
 }

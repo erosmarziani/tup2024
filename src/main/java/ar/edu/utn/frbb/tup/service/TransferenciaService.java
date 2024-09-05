@@ -1,4 +1,4 @@
-package ar.edu.utn.frbb.tup.service;
+/*package ar.edu.utn.frbb.tup.service;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -45,7 +45,10 @@ public class TransferenciaService {
         } else if (cuentaOrigen == null) {
             throw new CuentaInexistenteException("No se ha encontrado la cuenta origen en la base de datos");
         } else if (cuentaDestino == null) {
-            throw new CuentaInexistenteException("No se ha encontrado la cuenta destino en la base de datos");
+            if (banelcoService.transferir() == false) {
+                throw new TransferenciaRechazadaException("La transferencia entre los bancos fue rechazada");
+            }
+            e
         }
 
         Cliente clienteOrigen = clienteDao.obtenerClientePorDNI(cuentaOrigen.getTitular());
@@ -57,17 +60,33 @@ public class TransferenciaService {
         }
 
         // Si las cuentas no pertenecen al mismo banco se consulta a un servicio que da una respuesta aleatoria
-        if (clienteOrigen.getBanco() != clienteDestino.getBanco()) {
-            if (banelcoService.transferir() == false) {
-                throw new TransferenciaRechazadaException("La transferencia entre los bancos fue rechazada");
-            }
-        }
-
+        
         // Verificar que la moneda es la misma en ambas cuentra
         if (cuentaDestino.getMoneda() != cuentaOrigen.getMoneda()) {
             throw new IllegalArgumentException("Las cuentas deben tener la misma moneda");
         }
     }
+
+    private Transferencia transfDistintosBancos(Cuenta cuentaOrigen, double monto){
+        //Calcular el importe que se acredita y debita, descontando los cargos
+        double montoTotal =  calcularCargo(cuentaDestino.getMoneda(), monto);
+
+         //Actualizar el saldo solo en la cuenta de origen que es la que se encuentra en el banco
+    cuentaDao.actualizarBalance(cuentaOrigen.getNumeroCuenta(), cuentaOrigen.getBalance() - montoTotal);
+
+    long idMovimiento = generarIdMovimiento();
+    //Agregar movimiento a la cuenta Origen
+       movimientosDao.agregarMovimiento(
+        new Movimiento(
+            idMovimiento,
+            cuentaOrigen.getTitular(),
+            LocalDate.now(),
+            montoTotal,
+            TipoOperacion.DEBITO,
+            cuentaOrigen.getMoneda())
+       );
+
+}
 
     private Transferencia realizarTransferencia(Cuenta cuentaOrigen, Cuenta cuentaDestino, double monto){
         //Calcular el importe que se acredita y debita, descontando los cargos
@@ -116,3 +135,5 @@ public class TransferenciaService {
         return 0;
     }
 }
+
+*/

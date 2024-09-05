@@ -6,6 +6,7 @@ import ar.edu.utn.frbb.tup.persistence.exception.ErrorArchivoNoEncontradoExcepti
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorCuentaNoEncontradaException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorEliminarLineaException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorEscribirArchivoException;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorGuardarClienteException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorGuardarCuentaException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorManejoArchivoException;
 import ar.edu.utn.frbb.tup.persistence.implementation.CuentaDaoImpl;
@@ -35,7 +36,7 @@ public class MovimientoService {
 
     public Movimiento realizarDeposito(long idCuenta, double monto,TipoMoneda tipoMoneda) throws CuentaInexistenteException,
             ErrorEscribirArchivoException, ErrorArchivoNoEncontradoException, ErrorCuentaNoEncontradaException,
-            ErrorGuardarCuentaException, ErrorEliminarLineaException, ErrorManejoArchivoException, IOException {
+            ErrorGuardarCuentaException, ErrorEliminarLineaException, ErrorManejoArchivoException, IOException, ErrorGuardarClienteException {
 
         Cuenta cuenta = cuentaDao.obtenerCuentaPorId(idCuenta);
 
@@ -54,7 +55,7 @@ public class MovimientoService {
     }
 
     public Movimiento realizarRetiro(long idCuenta, double monto, TipoMoneda tipoMoneda)
-            throws CuentaNoEncontradaException, CuentaSinSaldoException, ErrorCuentaNoEncontradaException, ErrorArchivoNoEncontradoException, IOException, ErrorGuardarCuentaException, ErrorEliminarLineaException, ErrorManejoArchivoException, ErrorEscribirArchivoException {
+            throws CuentaNoEncontradaException, CuentaSinSaldoException, ErrorCuentaNoEncontradaException, ErrorArchivoNoEncontradoException, IOException, ErrorGuardarCuentaException, ErrorEliminarLineaException, ErrorManejoArchivoException, ErrorEscribirArchivoException, ErrorGuardarClienteException {
         Cuenta cuenta = cuentaDao.obtenerCuentaPorId(idCuenta);
         if (cuenta == null) {
             throw new CuentaNoEncontradaException("Cuenta no encontrada");

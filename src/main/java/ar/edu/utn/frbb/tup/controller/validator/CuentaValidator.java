@@ -1,15 +1,22 @@
 package ar.edu.utn.frbb.tup.controller.validator;
 
 import ar.edu.utn.frbb.tup.controller.Dto.CuentaDto;
+import org.springframework.stereotype.Component;
 
+
+@Component
 public class CuentaValidator {
     public void validarCuenta(CuentaDto cuentaDto) {
 
-        validarExistenDatos(cuentaDto);
+        validarDatos(cuentaDto);
         validarDNI(cuentaDto.getDniTitular());
     }
 
-    private void validarExistenDatos(CuentaDto cuentaDto) {
+    private void validarDatos(CuentaDto cuentaDto) {
+        if (cuentaDto.getIdCuenta() == null || cuentaDto.getIdCuenta().isEmpty()) {
+           throw new IllegalArgumentException("El id de la cuenta es obligatorio"); 
+        }
+        
         if (cuentaDto.getMoneda() == null || cuentaDto.getMoneda().isEmpty()) {
             throw new IllegalArgumentException("La moneda es obligatoria");
         }
@@ -18,6 +25,7 @@ public class CuentaValidator {
             throw new IllegalArgumentException("El tipo de cuenta es obligatorio");
         }
     }
+
 
     private void validarDNI(String dni) {
         // Validar que exista el dni antes de parsear

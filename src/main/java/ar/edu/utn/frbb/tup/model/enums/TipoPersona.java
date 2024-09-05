@@ -2,8 +2,8 @@ package ar.edu.utn.frbb.tup.model.enums;
 
 public enum TipoPersona {
 
-    PERSONA_FISICA("F"),
-    PERSONA_JURIDICA("J");
+    PERSONA_FISICA("PERSONA_FISICA"),
+    PERSONA_JURIDICA("PERSONA_JURIDICA");
 
     private final String descripcion;
 
@@ -23,5 +23,5 @@ public enum TipoPersona {
             }
         }
         throw new IllegalArgumentException("No se pudo encontrar un TipoPersona con la descripción: " + text);
-    }
+    } 
 }

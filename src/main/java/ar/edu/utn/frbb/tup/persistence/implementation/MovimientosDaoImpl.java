@@ -10,19 +10,19 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.stereotype.Repository;
+
 import ar.edu.utn.frbb.tup.model.Movimiento;
 import ar.edu.utn.frbb.tup.model.enums.*;
 import ar.edu.utn.frbb.tup.persistence.*;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorEliminarLineaException;
-import ar.edu.utn.frbb.tup.persistence.exception.ErrorEscribirArchivoException;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorGuardarClienteException;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorManejoArchivoException;
 
+
+@Repository
 public class MovimientosDaoImpl implements MovimientosDAO {
-    private static final String FILE_PATH = "src" + File.separator + "main" + File.separator + "java" + File.separator
-            + "ar" + File.separator + "edu" + File.separator + "utn" + File.separator + "frbb" + File.separator + "tup"
-            + File.separator + "persistence" + File.separator + "resources" + File.separator + "movimientos.txt";
-
-
+    private static final String FILE_PATH = "tup2024\\src\\main\\java\\ar\\edu\\utn\\frbb\\tup\\persistence\\resources\\movimientos.txt";
 
     public Movimiento parseMovimiento(String[] campos){
         Movimiento movimiento = new Movimiento(
@@ -34,27 +34,22 @@ public class MovimientosDaoImpl implements MovimientosDAO {
             TipoMoneda.valueOf(campos[5]));
             return movimiento;
     }
+       @Override
+    public void agregarMovimiento(Movimiento movimiento) throws ErrorGuardarClienteException {
 
-    @Override
-    public void agregarMovimiento(Movimiento movimiento) throws ErrorEscribirArchivoException {
-        File file = new File(FILE_PATH);
-        boolean isHeader = true;
+        File file = new File(FILE_PATH); //Creacion de archivo mediante la clase File
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-            if (isHeader) {
-                writer.write("idMovimiento;idCuenta;fecha;importe;tipoOperacion");
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))){
+            if(file.length() == 0){
+                writer.write("idMovimiento;idCuenta;fechaOperacion;importe;tipoOperacion;tipoMoneda");
                 writer.newLine();
             }
-            writer.write(
-                    movimiento.getIdMovimiento() + ";" + movimiento.getIdCuenta() + ";" + movimiento.getFechaOperacion()
-                            + ";" + movimiento.getImporte() + ";" + movimiento.getTipoOperacion());
+            writer.write(movimiento.getIdMovimiento() + ";" +    movimiento.getIdCuenta() + ";" + movimiento.getFechaOperacion()+ 
+            ";" + movimiento.getImporte() + ";" + movimiento.getTipoOperacion() + ";" + movimiento.getTipoMoneda() + ";" );
             writer.newLine();
-
-        } catch (IOException e) {
-            throw new ErrorEscribirArchivoException("Error al escribir en el archivo: " + e.getMessage());
-
-        }
-
+        }catch( IOException e ){
+            throw new ErrorGuardarClienteException("Error al guardar el movimiento en el archivo: " , e);
+        }             
     }
 
     @Override
