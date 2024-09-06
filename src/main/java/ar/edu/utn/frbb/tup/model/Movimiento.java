@@ -4,26 +4,15 @@ import java.time.LocalDate;
 import ar.edu.utn.frbb.tup.model.enums.*;
 
 public class Movimiento {
-    private final long idMovimiento;
     private long idCuenta;
     private LocalDate fechaOperacion;
     private double importe;
     TipoOperacion tipoOperacion;
     TipoMoneda tipoMoneda;
     
-    //constructor pasa idMovimiento por parametro
-    public Movimiento(long idMovimiento, long idCuenta, LocalDate fechaOperacion, double importe, TipoOperacion tipoOperacion, TipoMoneda tipoMoneda){
-        this.idMovimiento = idMovimiento;
-        this.idCuenta = idCuenta;
-        this.fechaOperacion = fechaOperacion;
-        this.importe = importe;
-        this.tipoOperacion = tipoOperacion;
-        this.tipoMoneda = tipoMoneda;
-    }
 
     //Constructor para creacion sin ID
     public Movimiento(long idCuenta, LocalDate fechaOperacion, double importe, TipoOperacion tipoOperacion, TipoMoneda tipoMoneda){
-        this.idMovimiento = (long) (Math.random() * 100000); // genera un id aleatorio
         this.idCuenta = idCuenta;
         this.fechaOperacion = fechaOperacion;
         this.importe = importe;
@@ -60,12 +49,8 @@ public class Movimiento {
         return tipoOperacion;
     }
     
-    
     public void setTipoOperacion(TipoOperacion tipoOperacion) {
         this.tipoOperacion = tipoOperacion;
-    }
-    public long getIdMovimiento(){
-        return idMovimiento;
     }
 
     public TipoMoneda getTipoMoneda() {

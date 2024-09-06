@@ -1,28 +1,20 @@
 package ar.edu.utn.frbb.tup.model.enums;
 
 public enum TipoMoneda {
-    ARS("PESOS"),
-    USD("DOLARES");
 
-    private final String descripcion;
-
-    TipoMoneda(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
+    ARS,
+    USD;
     
     //Metodo para convertir un String en TipoMoneda
     public static TipoMoneda fromString(String value) {
-        for (TipoMoneda moneda : TipoMoneda.values()) {
-            if (moneda.getDescripcion().equalsIgnoreCase(value)) {
-                return moneda;
-            }
+        try{
+            return TipoMoneda.valueOf(value.toUpperCase());
+        }catch(IllegalArgumentException e){
+            throw new IllegalArgumentException("Tipo de moneda incorrecta");
         }
-        return null;
     }
 
+    
+    
 
 }

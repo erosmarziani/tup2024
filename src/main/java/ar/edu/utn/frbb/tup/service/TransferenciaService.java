@@ -34,7 +34,7 @@ public class TransferenciaService {
     @Autowired
     private ClienteDaoImpl clienteDao;
 
-    public void validacionTransferencia(long idCuentaOrigen, long idCuentaDestino, double monto, TipoMoneda tipoMoneda) throws ErrorCuentaNoEncontradaException, ErrorArchivoNoEncontradoException, IOException, CuentaInexistenteException, TransferenciaRechazadaException {
+    public void validacionTransferencia(long idCuentaOrigen, long idCuentaDestino, double importe, TipoMoneda tipoMoneda) throws ErrorCuentaNoEncontradaException, ErrorArchivoNoEncontradoException, IOException, CuentaInexistenteException, TransferenciaRechazadaException {
 
         Cuenta cuentaOrigen = cuentaDao.obtenerCuentaPorId(idCuentaOrigen);
         Cuenta cuentaDestino = cuentaDao.obtenerCuentaPorId(idCuentaDestino);
@@ -55,7 +55,7 @@ public class TransferenciaService {
         Cliente clienteDestino = clienteDao.obtenerClientePorDNI(cuentaDestino.getTitular());
 
         // Verificar saldo
-        if (cuentaOrigen.getBalance() < monto) {
+        if (cuentaOrigen.getBalance() < importe) {
             throw new IllegalArgumentException("No se puede realizar la transferencia, saldo insuficiente");
         }
 
@@ -67,12 +67,12 @@ public class TransferenciaService {
         }
     }
 
-    private Transferencia transfDistintosBancos(Cuenta cuentaOrigen, double monto){
+    private Transferencia transfDistintosBancos(Cuenta cuentaOrigen, double importe){
         //Calcular el importe que se acredita y debita, descontando los cargos
-        double montoTotal =  calcularCargo(cuentaDestino.getMoneda(), monto);
+        double importeTotal =  calcularCargo(cuentaDestino.getMoneda(), importe);
 
          //Actualizar el saldo solo en la cuenta de origen que es la que se encuentra en el banco
-    cuentaDao.actualizarBalance(cuentaOrigen.getNumeroCuenta(), cuentaOrigen.getBalance() - montoTotal);
+    cuentaDao.actualizarBalance(cuentaOrigen.getNumeroCuenta(), cuentaOrigen.getBalance() - importeTotal);
 
     long idMovimiento = generarIdMovimiento();
     //Agregar movimiento a la cuenta Origen
@@ -81,20 +81,20 @@ public class TransferenciaService {
             idMovimiento,
             cuentaOrigen.getTitular(),
             LocalDate.now(),
-            montoTotal,
+            importeTotal,
             TipoOperacion.DEBITO,
             cuentaOrigen.getMoneda())
        );
 
 }
 
-    private Transferencia realizarTransferencia(Cuenta cuentaOrigen, Cuenta cuentaDestino, double monto){
+    private Transferencia realizarTransferencia(Cuenta cuentaOrigen, Cuenta cuentaDestino, double importe){
         //Calcular el importe que se acredita y debita, descontando los cargos
-        double montoTotal =  calcularCargo(cuentaDestino.getMoneda(), monto);
+        double importeTotal =  calcularCargo(cuentaDestino.getMoneda(), importe);
 
     //Actualizar el saldo en las cuentas
-    cuentaDao.actualizarBalance(cuentaOrigen.getNumeroCuenta(), cuentaOrigen.getBalance() - montoTotal);
-    cuentaDao.actualizarBalance(cuentaDestino.getNumeroCuenta(), cuentaDestino.getBalance() + montoTotal);
+    cuentaDao.actualizarBalance(cuentaOrigen.getNumeroCuenta(), cuentaOrigen.getBalance() - importeTotal);
+    cuentaDao.actualizarBalance(cuentaDestino.getNumeroCuenta(), cuentaDestino.getBalance() + importeTotal);
 
     long idMovimiento = generarIdMovimiento();
     //Agregar movimiento a la cuenta Origen
@@ -103,7 +103,7 @@ public class TransferenciaService {
             idMovimiento,
             cuentaOrigen.getTitular(),
             LocalDate.now(),
-            montoTotal,
+            importeTotal,
             TipoOperacion.DEBITO,
             cuentaOrigen.getMoneda())
        );
@@ -114,23 +114,23 @@ public class TransferenciaService {
             idMovimiento,
             cuentaDestino.getTitular(),
             LocalDate.now()x,
-            montoTotal,
+            importeTotal,
             TipoOperacion.CREDITO,
             cuentaDestino.getMoneda())
        );
-        return new Transferencia(cuentaOrigen.getNumeroCuenta(), cuentaDestino.getNumeroCuenta(),LocalDate.now(), montoTotal,cuentaOrigen.getMoneda();
+        return new Transferencia(cuentaOrigen.getNumeroCuenta(), cuentaDestino.getNumeroCuenta(),LocalDate.now(), importeTotal,cuentaOrigen.getMoneda();
     }
 
     private long generarIdMovimiento() {
         return (long) (Math.random() * 100000); // Generar un ID único aleatorio para el ejemplo
     }
 
-    private double calcularCargo(TipoMoneda tipoMoneda, double monto) {
-        if (tipoMoneda == TipoMoneda.ARS && monto > 1000000) {
-            return monto - (monto * 0.02);
+    private double calcularCargo(TipoMoneda tipoMoneda, double importe) {
+        if (tipoMoneda == TipoMoneda.ARS && importe > 1000000) {
+            return importe - (importe * 0.02);
         }
-        if (tipoMoneda == TipoMoneda.USD && monto > 5000) {
-            return monto - (monto * 0.05);
+        if (tipoMoneda == TipoMoneda.USD && importe > 5000) {
+            return importe - (importe * 0.05);
         }
         return 0;
     }

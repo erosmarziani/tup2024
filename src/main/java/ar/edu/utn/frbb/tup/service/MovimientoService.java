@@ -34,7 +34,7 @@ public class MovimientoService {
     @Autowired
     private CuentaDaoImpl cuentaDao;
 
-    public Movimiento realizarDeposito(long idCuenta, double monto,TipoMoneda tipoMoneda) throws CuentaInexistenteException,
+    public Movimiento realizarDeposito(long idCuenta, double importe) throws CuentaInexistenteException,
             ErrorEscribirArchivoException, ErrorArchivoNoEncontradoException, ErrorCuentaNoEncontradaException,
             ErrorGuardarCuentaException, ErrorEliminarLineaException, ErrorManejoArchivoException, IOException, ErrorGuardarClienteException {
 
@@ -43,30 +43,36 @@ public class MovimientoService {
         if (cuenta == null) {
             throw new CuentaInexistenteException("El CBU no existe");
         }
+        if (importe < 0) {
+            throw new IllegalArgumentException("El importe no puede ser negativo");
+        }
 
-        double nuevoBalance = cuenta.getBalance() + monto;
+        double nuevoBalance = cuenta.getBalance() + importe;
         cuentaDao.actualizarBalance(idCuenta, nuevoBalance);
 
-        Movimiento movimiento = crearMovimiento(idCuenta, LocalDate.now(), nuevoBalance, TipoOperacion.DEBITO, tipoMoneda);
+        Movimiento movimiento = crearMovimiento(idCuenta, LocalDate.now(), nuevoBalance, TipoOperacion.DEBITO, cuenta.getMoneda());
 
         movimientosDao.agregarMovimiento(movimiento);
 
         return movimiento;
     }
 
-    public Movimiento realizarRetiro(long idCuenta, double monto, TipoMoneda tipoMoneda)
+    public Movimiento realizarRetiro(long idCuenta, double importe)
             throws CuentaNoEncontradaException, CuentaSinSaldoException, ErrorCuentaNoEncontradaException, ErrorArchivoNoEncontradoException, IOException, ErrorGuardarCuentaException, ErrorEliminarLineaException, ErrorManejoArchivoException, ErrorEscribirArchivoException, ErrorGuardarClienteException {
         Cuenta cuenta = cuentaDao.obtenerCuentaPorId(idCuenta);
         if (cuenta == null) {
             throw new CuentaNoEncontradaException("Cuenta no encontrada");
         }
-        if (cuenta.getBalance() < monto) {
+        if (cuenta.getBalance() < importe) {
             throw new CuentaSinSaldoException("Saldo insuficiente");
         }
-        double nuevoBalance = cuenta.getBalance() - monto;
+        if (importe < 0) {
+            throw new IllegalArgumentException("El importe no puede ser negativo");
+        }
+        double nuevoBalance = cuenta.getBalance() - importe;
         cuentaDao.actualizarBalance(idCuenta, nuevoBalance);
 
-        Movimiento movimiento = crearMovimiento(idCuenta, LocalDate.now(), nuevoBalance, TipoOperacion.CREDITO,tipoMoneda);
+        Movimiento movimiento = crearMovimiento(idCuenta, LocalDate.now(), nuevoBalance, TipoOperacion.CREDITO,cuenta.getMoneda());
 
         movimientosDao.agregarMovimiento(movimiento);
         return movimiento;
@@ -81,11 +87,12 @@ public class MovimientoService {
         return movimientos;
     }
 
-    public void eliminarMovimientosPorID(long idCuenta) throws ErrorManejoArchivoException, ErrorEliminarLineaException, MovimientosVaciosException {
-        boolean movimientoEncontrado = movimientosDao.eliminarMovimientoPorId(idCuenta);
+    public String eliminarMovimientosPorID(long idCuenta) throws ErrorManejoArchivoException, ErrorEliminarLineaException, MovimientosVaciosException {
+        boolean movimientoEncontrado = movimientosDao.eliminarMovimientosPorCuenta(idCuenta);
         if (movimientoEncontrado == false) {
             throw new MovimientosVaciosException("No se encontraron movimientos");
         }
+        return "ok: Movimientos de la cuenta" + idCuenta + " eliminados";
 
     }
 

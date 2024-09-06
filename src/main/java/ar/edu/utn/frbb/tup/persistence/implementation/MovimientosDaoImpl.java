@@ -27,31 +27,29 @@ public class MovimientosDaoImpl implements MovimientosDAO {
     public Movimiento parseMovimiento(String[] campos){
         Movimiento movimiento = new Movimiento(
             Long.parseLong(campos[0]),
-            Long.parseLong(campos[1]),
-            LocalDate.parse(campos[2]),
-            Integer.parseInt(campos[3]),
-            TipoOperacion.valueOf(campos[4]),
-            TipoMoneda.valueOf(campos[5]));
+            LocalDate.parse(campos[1]),
+            Double.parseDouble(campos[2]),
+            TipoOperacion.valueOf(campos[3]),
+            TipoMoneda.valueOf(campos[4]));
             return movimiento;
     }
-       @Override
+    @Override
     public void agregarMovimiento(Movimiento movimiento) throws ErrorGuardarClienteException {
 
         File file = new File(FILE_PATH); //Creacion de archivo mediante la clase File
 
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))){
             if(file.length() == 0){
-                writer.write("idMovimiento;idCuenta;fechaOperacion;importe;tipoOperacion;tipoMoneda");
+                writer.write("idCuenta;fechaOperacion;importe;tipoOperacion;tipoMoneda");
                 writer.newLine();
             }
-            writer.write(movimiento.getIdMovimiento() + ";" +    movimiento.getIdCuenta() + ";" + movimiento.getFechaOperacion()+ 
+            writer.write(movimiento.getIdCuenta() + ";" + movimiento.getFechaOperacion()+ 
             ";" + movimiento.getImporte() + ";" + movimiento.getTipoOperacion() + ";" + movimiento.getTipoMoneda() + ";" );
             writer.newLine();
         }catch( IOException e ){
             throw new ErrorGuardarClienteException("Error al guardar el movimiento en el archivo: " , e);
         }             
     }
-
     @Override
     public List<Movimiento> obtenerMovimientoPorCuenta(long idCuenta) throws ErrorManejoArchivoException {
         List<Movimiento> movimientos = new ArrayList<>();
@@ -66,7 +64,7 @@ public class MovimientosDaoImpl implements MovimientosDAO {
 
                 String[] campos = line.split(";");
                 if (campos.length >= 5) {
-                    Long numeroCuenta = Long.parseLong(campos[1]);
+                    Long numeroCuenta = Long.parseLong(campos[0]);
                     if (numeroCuenta.equals(idCuenta)) {
                         Movimiento movimiento = parseMovimiento(campos);
                         movimientos.add(movimiento);
@@ -81,7 +79,7 @@ public class MovimientosDaoImpl implements MovimientosDAO {
     }
 
     @Override
-    public boolean eliminarMovimientoPorId(long idCuenta) throws ErrorManejoArchivoException, ErrorEliminarLineaException {
+    public boolean eliminarMovimientosPorCuenta(long idCuenta) throws ErrorManejoArchivoException, ErrorEliminarLineaException {
         File inputFile = new File(FILE_PATH);
         File tempFile = new File(inputFile.getAbsolutePath() + ".tmp");
         boolean movimientoEncontrado = false;
@@ -102,11 +100,9 @@ public class MovimientosDaoImpl implements MovimientosDAO {
                 }
                 String[] campos = line.split(";");
                 if (campos.length >= 5) {
-                    long idCuentaActual= Long.parseLong(campos[1]);
+                    long idCuentaActual= Long.parseLong(campos[0]);
                     if (idCuentaActual == idCuenta) {
                         movimientoEncontrado = true;
-                       //Cambio el valor del booleano
-
                     } else {
                         writer.write(line);
                         writer.newLine();

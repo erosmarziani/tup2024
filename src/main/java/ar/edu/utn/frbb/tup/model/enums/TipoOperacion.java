@@ -1,31 +1,17 @@
 package ar.edu.utn.frbb.tup.model.enums;
 
 public enum TipoOperacion {
-    DEBITO("DEBITO"),
-    CREDITO("CREDITO");
+    DEBITO,
+    CREDITO;
 
-    // Constructor vacío para que no se pueda instanciar    
-    private String detalle;
-
-    // Constructor con parámetro
-    private TipoOperacion(String detalle) {
-        this.detalle = detalle;
-    }
-    
-    // Método para obtener el detalle de la operación
-    public String getDetalle() {
-        return detalle;
-    }
 
     // Método para obtener el enumerado por el detalle de la operación
-    public static TipoOperacion obtenerPorDetalle(String detalle) {
-        for (TipoOperacion tipoOperacion : values()) {
-            if (tipoOperacion.getDetalle().equals(detalle)) {
-                return tipoOperacion;
-            }
+    public static TipoOperacion fromString(String value) {
+        try{
+            return TipoOperacion.valueOf(value.toUpperCase());
+        }catch(IllegalArgumentException e ){
+            throw new IllegalArgumentException("Tipo de operacion incorrecta");
         }
-        throw new IllegalArgumentException("No se ha encontrado un tipo de operacion con la descripcion");
-    
-}
+    }
 
 }

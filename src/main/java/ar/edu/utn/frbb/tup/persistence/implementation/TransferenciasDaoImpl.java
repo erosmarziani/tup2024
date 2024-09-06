@@ -21,7 +21,7 @@ public class TransferenciasDaoImpl implements TransferenciasDAO{
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
             if (isHeader) {
-                writer.write("idOrigen;idDestino;fechaOperacion;monto;Resultado");
+                writer.write("idOrigen;idDestino;fechaOperacion;importe;Resultado");
                 writer.newLine();
             }
             writer.write(

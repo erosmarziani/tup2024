@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import ar.edu.utn.frbb.tup.model.Cliente;
@@ -29,6 +30,8 @@ import ar.edu.utn.frbb.tup.persistence.exception.ErrorManejoArchivoException;
 public class CuentaDaoImpl implements CuentasDAO {
     private static final String FILE_PATH = "tup2024\\src\\main\\java\\ar\\edu\\utn\\frbb\\tup\\persistence\\resources\\cuentas.txt";
 
+    @Autowired
+    private ClienteDaoImpl clienteDao;
     public Cuenta parsearCuenta(String[] campos) {
         Cuenta cuenta = new Cuenta();
 
@@ -48,7 +51,7 @@ public class CuentaDaoImpl implements CuentasDAO {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
             if (file.length() == 0) {
-                writer.write("ID_CUENTA,FECHA_CREACION,BALANCE,TIPO_CUENTA,TITULAR,MONEDA");
+                writer.write("ID_CUENTA;FECHA_CREACION;BALANCE;TIPO_CUENTA;TITULAR;MONEDA");
                 writer.newLine();
             }
             writer.write(cuenta.getNumeroCuenta() + ";"
@@ -79,22 +82,23 @@ public class CuentaDaoImpl implements CuentasDAO {
                 if (datos.length >= 6) {
                     long numeroCuentaLeida = Long.parseLong(datos[0]);
                     if (numeroCuentaLeida == idCuenta) {
-                        LocalDate fechaCreacion = LocalDate.parse(datos[1]);
-                        int balance = Integer.parseInt(datos[2]);
-                        TipoCuenta tipoCuenta = TipoCuenta.valueOf(datos[3]);
-                        long dniTitular = Long.parseLong(datos[4]);
-                        TipoMoneda tipoMoneda = TipoMoneda.valueOf(datos[5]);
+                        Cuenta cuentaObtenida = new Cuenta(
+                            numeroCuentaLeida,
+                            LocalDate.parse(datos[1]),
+                            Double.parseDouble(datos[2]),
+                            TipoCuenta.valueOf(datos[3]),
+                            Long.parseLong(datos[4]),
+                            TipoMoneda.valueOf(datos[5])
 
-                        // Aquí se debe obtener el Cliente del DAO correspondiente
-                        ClienteDaoImpl clienteDao = new ClienteDaoImpl(); // Esto debería ser inyectado
-                        Cliente titular = clienteDao.obtenerClientePorDNI(dniTitular);
+
+                        );
+                        //Obtener el cliente del Dao
+                        Cliente titular = clienteDao.obtenerClientePorDNI(Long.parseLong(datos[4]));
                         if (titular == null) {
-                            throw new ErrorCuentaNoEncontradaException(
-                                    "No se encontró el cliente con el DNI: " + dniTitular);
+                            throw new ErrorCuentaNoEncontradaException("No se encontró el cliente con el DNI");
                         }
 
-                        return new Cuenta(numeroCuentaLeida, fechaCreacion, balance, tipoCuenta, dniTitular,
-                                tipoMoneda);
+                        return  cuentaObtenida;
                     }
                 }
             }
@@ -126,7 +130,7 @@ public class CuentaDaoImpl implements CuentasDAO {
                 }
                 String[] campos = line.split(";");
                 if (campos.length >= 6) {
-                    long idActual = Long.parseLong(campos[5]);
+                    long idActual = Long.parseLong(campos[4]);
                     if (idActual == clienteID) {
                         cuentaEliminada = parsearCuenta(campos);
 
@@ -212,7 +216,6 @@ public class CuentaDaoImpl implements CuentasDAO {
     public Cuenta actualizarCuenta(Cuenta cuenta) throws ErrorActualizarCuentaException, ErrorGuardarCuentaException,
             ErrorArchivoNoEncontradoException, ErrorCuentaNoEncontradaException {
         List<Cuenta> cuentas = obtenerCuentas();
-
         boolean cuentaEncontrada = false;
 
         for (Cuenta c : cuentas) {

@@ -9,7 +9,7 @@ public class Transferencia  {
     private long idOrigen;
     private long idDestino;
     private LocalDate fechaOperacion;
-    private double monto;
+    private double importe;
     private TipoMoneda tipoMoneda;
     private ResultadoTransferencia ResultadoTransferencia;
 
@@ -17,7 +17,7 @@ public class Transferencia  {
         this.idOrigen = idOrigen;
         this.idDestino = idDestino;
         this.fechaOperacion = fechaOperacion;
-        this.monto = importe;
+        this.importe = importe;
         this.tipoMoneda = moneda;
         this.ResultadoTransferencia = resultadoTransferencia;
 
@@ -28,11 +28,11 @@ public class Transferencia  {
     public void setFechaOperacion(LocalDate fechaOperacion) {
         this.fechaOperacion = fechaOperacion;
     }
-    public double getMonto() {
-        return monto;
+    public double getimporte() {
+        return importe;
     }
-    public void setMonto(double monto) {
-        this.monto = monto;
+    public void setimporte(double importe) {
+        this.importe = importe;
     }
     public TipoMoneda getTipoMoneda() {
         return tipoMoneda;
