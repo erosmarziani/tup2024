@@ -2,6 +2,7 @@ package ar.edu.utn.frbb.tup.model;
 
 import java.time.LocalDate;
 
+import ar.edu.utn.frbb.tup.controller.Dto.TransferenciaDto;
 import ar.edu.utn.frbb.tup.model.enums.*;
 
 public class Transferencia  {
@@ -11,15 +12,22 @@ public class Transferencia  {
     private LocalDate fechaOperacion;
     private double importe;
     private TipoMoneda tipoMoneda;
-    private ResultadoTransferencia ResultadoTransferencia;
 
-    public Transferencia(long idOrigen,long idDestino,LocalDate fechaOperacion, double importe, TipoMoneda moneda,ResultadoTransferencia resultadoTransferencia) {
+    //Constructor para el dto
+    public Transferencia(TransferenciaDto transferenciaDto) {
+        this.idOrigen = Long.parseLong(transferenciaDto.getIdOrigen());
+        this.idDestino = Long.parseLong(transferenciaDto.getIdDestino());
+        this.fechaOperacion = LocalDate.parse(transferenciaDto.getFechaOperacion());
+        this.importe = Double.parseDouble(transferenciaDto.getImporte());
+        this.tipoMoneda =TipoMoneda.fromString(transferenciaDto.getTipoMoneda());
+    }
+
+    public Transferencia(long idOrigen,long idDestino,LocalDate fechaOperacion, double importe, TipoMoneda moneda) {
         this.idOrigen = idOrigen;
         this.idDestino = idDestino;
         this.fechaOperacion = fechaOperacion;
         this.importe = importe;
         this.tipoMoneda = moneda;
-        this.ResultadoTransferencia = resultadoTransferencia;
 
     }
     public LocalDate getFechaOperacion() {
@@ -28,10 +36,10 @@ public class Transferencia  {
     public void setFechaOperacion(LocalDate fechaOperacion) {
         this.fechaOperacion = fechaOperacion;
     }
-    public double getimporte() {
+    public double getImporte() {
         return importe;
     }
-    public void setimporte(double importe) {
+    public void setImporte(double importe) {
         this.importe = importe;
     }
     public TipoMoneda getTipoMoneda() {
@@ -46,13 +54,6 @@ public class Transferencia  {
     public void setIdOrigen(long idOrigen) {
         this.idOrigen = idOrigen;
     }
-    public void setResultado(ResultadoTransferencia resultado) {
-        this.ResultadoTransferencia = resultado;
-    }
-    public ResultadoTransferencia getResultadoTransferencia() {
-        return ResultadoTransferencia;
-    }
-
     public long getIdDestino() {
         return idDestino;
     }

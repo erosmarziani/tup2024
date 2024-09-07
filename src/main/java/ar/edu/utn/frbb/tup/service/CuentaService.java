@@ -7,6 +7,7 @@ import ar.edu.utn.frbb.tup.model.enums.*;
 import ar.edu.utn.frbb.tup.persistence.exception.*;
 import ar.edu.utn.frbb.tup.persistence.implementation.ClienteDaoImpl;
 import ar.edu.utn.frbb.tup.persistence.implementation.CuentaDaoImpl;
+import ar.edu.utn.frbb.tup.persistence.implementation.MovimientosDaoImpl;
 import ar.edu.utn.frbb.tup.service.exception.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class CuentaService {
 
     @Autowired
     private ClienteDaoImpl clienteDao;
+
+    @Autowired
+    private MovimientosDaoImpl movimientosDao;
     
     public Cuenta altaCuenta(CuentaDto cuentaDto)
             throws ErrorArchivoNoEncontradoException, ClienteNoEncontradoException, ErrorGuardarCuentaException {
@@ -46,7 +50,8 @@ public class CuentaService {
             throw new CuentaNoEncontradaException("El cliente no tiene cuentas asociadas en la base de datos.");
 
         }
-        // Borrar movimientos y transferencias
+        movimientosDao.eliminarMovimientosPorCuenta(cuenta.getNumeroCuenta());
+        
         return cuenta;
     }
 
