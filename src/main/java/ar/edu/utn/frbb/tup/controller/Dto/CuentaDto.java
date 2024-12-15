@@ -11,6 +11,7 @@ public class CuentaDto {
     private String balance;
 
 
+    // Getters y Setters
     public String getIdCuenta() {
         return idCuenta;
     }

@@ -9,6 +9,7 @@ public class PersonaDto {
     private String telefono;
     private String fechaNacimiento;
 
+    //Getters y setters
     public String getNombre() {
         return nombre;
     }

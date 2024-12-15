@@ -12,6 +12,7 @@ public class Transferencia  {
     private LocalDate fechaOperacion;
     private double importe;
     private TipoMoneda tipoMoneda;
+    
 
     //Constructor para el dto
     public Transferencia(TransferenciaDto transferenciaDto) {

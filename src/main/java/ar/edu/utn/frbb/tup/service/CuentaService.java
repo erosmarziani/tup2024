@@ -1,8 +1,11 @@
 package ar.edu.utn.frbb.tup.service;
 
 import ar.edu.utn.frbb.tup.controller.Dto.CuentaDto;
+import ar.edu.utn.frbb.tup.controller.Dto.MovimientosResponseDto;
+import ar.edu.utn.frbb.tup.controller.Dto.MovimientoDto;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
+import ar.edu.utn.frbb.tup.model.Movimiento;
 import ar.edu.utn.frbb.tup.model.enums.*;
 import ar.edu.utn.frbb.tup.persistence.exception.*;
 import ar.edu.utn.frbb.tup.persistence.implementation.ClienteDaoImpl;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CuentaService {
@@ -26,62 +30,85 @@ public class CuentaService {
     private ClienteDaoImpl clienteDao;
 
     @Autowired
-    private MovimientosDaoImpl movimientosDao;
+    private MovimientosDaoImpl movimientoDao;
+
     
     public Cuenta altaCuenta(CuentaDto cuentaDto)
-            throws ErrorArchivoNoEncontradoException, ClienteNoEncontradoException, ErrorGuardarCuentaException {
+            throws LecturaException, GuardadoException, ErrorArchivoException, ClienteServiceException {
         Cuenta cuenta = new Cuenta(Long.parseLong(cuentaDto.getIdCuenta()), LocalDate.now(), 0,
                 TipoCuenta.valueOf(cuentaDto.getTipoCuenta()), Long.parseLong(cuentaDto.getDniTitular()),
                 TipoMoneda.valueOf(cuentaDto.getMoneda()));
         Cliente clienteAsociado = clienteDao.obtenerClientePorDNI(cuenta.getTitular());
         if (clienteAsociado == null) {
-            throw new ClienteNoEncontradoException("El cliente no ha sido encontrado en la base de datos");
+            throw new ClienteServiceException("El cliente no ha sido encontrado en la base de datos");
         }
         cuentaDao.guardarCuenta(cuenta);
         return cuenta;
 
     }
 
-    public Cuenta eliminarCuentasCliente(long idCliente)
-            throws ErrorEliminarLineaException, ErrorManejoArchivoException, CuentaNoEncontradaException {
+    public Cuenta eliminarCuentasCliente(long idCliente) throws CuentaServiceException, ErrorArchivoException{
         Cuenta cuenta = cuentaDao.eliminarCuenta(idCliente);
 
         if (cuenta == null) {
-            throw new CuentaNoEncontradaException("El cliente no tiene cuentas asociadas en la base de datos.");
+            throw new CuentaServiceException("El cliente no tiene cuentas asociadas en la base de datos.");
 
-        }
-        movimientosDao.eliminarMovimientosPorCuenta(cuenta.getNumeroCuenta());
-        
+        }        
         return cuenta;
     }
 
     public List<Cuenta> obtenerCuentasPorIdCliente(Long idCliente)
-            throws ErrorArchivoNoEncontradoException, ClienteNoEncontradoException {
+            throws ErrorArchivoException, ClienteServiceException {
         Cliente cliente = clienteDao.obtenerClientePorDNI(idCliente);
         if (cliente == null) {
-            throw new ClienteNoEncontradoException("El cliente no ha sido encontrado en la base de datos");
+            throw new ClienteServiceException("El cliente no ha sido encontrado en la base de datos");
         }
 
         List<Cuenta> cuentas = cuentaDao.obtenerCuentasDelCliente(idCliente);
         return cuentas;
     }
 
-    public List<Cuenta> obtenerCuentas()
-            throws ErrorArchivoNoEncontradoException, ErrorCuentaNoEncontradaException, CuentasInexistentesException {
+    public List<Cuenta> obtenerCuentas() throws ErrorArchivoException, CuentaServiceException {
         List<Cuenta> cuentas = cuentaDao.obtenerCuentas();
         if (cuentas.isEmpty()) {
-            throw new CuentasInexistentesException("No se han encontrado cuentas en la base de datos");
+            throw new CuentaServiceException("No se han encontrado cuentas en la base de datos");
         }
         return cuentas;
-
     }
 
-    public Cuenta actualizarCuenta(CuentaDto cuentaDto) throws CuentaNoEncontradaException, ErrorActualizarCuentaException, ErrorGuardarCuentaException, ErrorArchivoNoEncontradoException, ErrorCuentaNoEncontradaException  {
+    public Cuenta actualizarCuenta(CuentaDto cuentaDto) throws ErrorArchivoException, CuentaServiceException{
         Cuenta cuentaModificada = new Cuenta(cuentaDto);
         Cuenta cuentaExistente = cuentaDao.actualizarCuenta(cuentaModificada);
         if (cuentaExistente == null)  {
-            throw new CuentaNoEncontradaException("La cuenta no ha sido encontrada en la base de datos");
+            throw new CuentaServiceException("La cuenta no ha sido encontrada en la base de datos");
         }
         return cuentaModificada;
+    }
+
+    public MovimientosResponseDto obtenerMovimientos(long idCuenta) throws CuentaServiceException, ErrorArchivoException{
+        Cuenta cuenta = cuentaDao.obtenerCuentaPorId(idCuenta);
+
+        if (cuenta == null) {
+            throw new CuentaServiceException("Cuenta no encontrada");   
+        }
+
+        List<Movimiento> movimientos = movimientoDao.obtenerMovimientoPorCuenta(idCuenta);
+
+        List<MovimientoDto> transacciones = movimientos.stream().map(movimiento -> convertirMovimientoAMovimientoDto(movimiento)).collect(Collectors.toList());
+
+        MovimientosResponseDto response = new MovimientosResponseDto();
+        response.setNumeroCuenta(String.valueOf(cuenta.getNumeroCuenta()));
+        response.setTransacciones(transacciones);
+
+        return response;
+    }
+
+    private MovimientoDto convertirMovimientoAMovimientoDto(Movimiento movimiento){
+        MovimientoDto movimientoDto = new MovimientoDto();
+        movimientoDto.setFechaOperacion(movimiento.getFechaOperacion().toString());
+        movimientoDto.setTipo(movimiento.getTipo().toString());
+        movimientoDto.setDescripcion(movimiento.getDescripcion());
+        movimientoDto.setMonto(String.valueOf(movimiento.getMonto()));
+        return movimientoDto;
     }
 }

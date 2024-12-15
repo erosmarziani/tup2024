@@ -1,29 +1,23 @@
 package ar.edu.utn.frbb.tup.service;
 
-import java.io.IOException;
 import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.stereotype.Service;
 import ar.edu.utn.frbb.tup.controller.Dto.TransferenciaDto;
+import ar.edu.utn.frbb.tup.controller.exception.TransferenciaException;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.Movimiento;
 import ar.edu.utn.frbb.tup.model.Transferencia;
 import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
-import ar.edu.utn.frbb.tup.model.enums.TipoOperacion;
-import ar.edu.utn.frbb.tup.persistence.exception.ErrorArchivoNoEncontradoException;
-import ar.edu.utn.frbb.tup.persistence.exception.ErrorCuentaNoEncontradaException;
-import ar.edu.utn.frbb.tup.persistence.exception.ErrorEliminarLineaException;
-import ar.edu.utn.frbb.tup.persistence.exception.ErrorEscribirArchivoException;
-import ar.edu.utn.frbb.tup.persistence.exception.ErrorGuardarClienteException;
-import ar.edu.utn.frbb.tup.persistence.exception.ErrorGuardarCuentaException;
-import ar.edu.utn.frbb.tup.persistence.exception.ErrorManejoArchivoException;
+import ar.edu.utn.frbb.tup.model.enums.TipoMovimiento;
+import ar.edu.utn.frbb.tup.persistence.exception.ErrorArchivoException;
 import ar.edu.utn.frbb.tup.persistence.implementation.CuentaDaoImpl;
 import ar.edu.utn.frbb.tup.persistence.implementation.MovimientosDaoImpl;
-import ar.edu.utn.frbb.tup.persistence.implementation.TransferenciasDaoImpl;
-import ar.edu.utn.frbb.tup.service.exception.CuentaInexistenteException;
-import ar.edu.utn.frbb.tup.service.exception.TransferenciaRechazadaException;
+import ar.edu.utn.frbb.tup.service.exception.CuentaServiceException;
+import ar.edu.utn.frbb.tup.service.exception.TransferenciaServiceException;
 
+@Service
 public class TransferenciaService {
 
     @Autowired
@@ -35,54 +29,49 @@ public class TransferenciaService {
     @Autowired
     private BanelcoService banelcoService;
 
-    @Autowired
-    private TransferenciasDaoImpl transferenciasDao;;
-
-    public Transferencia validacionTransferencia(TransferenciaDto transferenciaDto)
-            throws ErrorCuentaNoEncontradaException, ErrorArchivoNoEncontradoException, IOException,
-            CuentaInexistenteException, TransferenciaRechazadaException, ErrorGuardarCuentaException,
-            ErrorEliminarLineaException, ErrorManejoArchivoException, ErrorGuardarClienteException, ErrorEscribirArchivoException {
+    public Transferencia validacionTransferencia(TransferenciaDto transferenciaDto) throws ErrorArchivoException, CuentaServiceException, TransferenciaServiceException, TransferenciaException{
 
         Transferencia transferencia = new Transferencia(transferenciaDto);
-        boolean existeDestino = true;
 
-        Cuenta cuentaOrigen = cuentaDao.obtenerCuentaPorId(transferencia.getIdOrigen());
-        Cuenta cuentaDestino = cuentaDao.obtenerCuentaPorId(transferencia.getIdDestino());
-
-        // Verifico que las dos cuentas existan
-        if (cuentaOrigen == null && cuentaDestino == null) {
-            throw new CuentaInexistenteException(
-                    "No se ha encontrado la cuenta origen y la cuenta destino en la base de datos");
-        } else if (cuentaOrigen == null) {
-            throw new CuentaInexistenteException("No se ha encontrado la cuenta origen en la base de datos");
-            // Si la cuenta origen no pertenece al banco se consulta a un servicio que da
-            // una respuesta aleatoria
-        } else if (cuentaDestino == null) {
-            if (banelcoService.transferir() == false) {
-                throw new TransferenciaRechazadaException("La transferencia entre los bancos fue rechazada");
-            } else {
-                existeDestino = false;
-            }
-        }
+        Cuenta cuentaOrigen = validarCuentaOrigen(transferencia.getIdDestino());
+        Cuenta cuentaDestino = validarCuentaDestino(transferencia.getIdDestino());
         // Verificar saldo
-        if (cuentaOrigen.getBalance() < transferencia.getImporte()) {
-            throw new IllegalArgumentException("No se puede realizar la transferencia, saldo insuficiente");
-        }
-        // Verificar que la moneda es la misma en ambas cuentra
-        if (cuentaDestino.getMoneda() != cuentaOrigen.getMoneda()) {
-            throw new IllegalArgumentException("Las cuentas deben tener la misma moneda");
-        }
-       if (!existeDestino) {
+        validarSaldo(cuentaOrigen,transferencia.getImporte());
+
+       if (cuentaDestino == null) {
             transferenciaDistintosBancos(cuentaOrigen, transferencia.getImporte());
        }else{
             transferenciaMismoBanco(cuentaOrigen, cuentaDestino, transferencia.getImporte());
        }
-       transferenciasDao.agregarTransferencias(transferencia);
        return transferencia;
        
     }
 
-    private void transferenciaDistintosBancos(Cuenta cuentaOrigen, double importe) throws ErrorArchivoNoEncontradoException, ErrorCuentaNoEncontradaException, ErrorGuardarCuentaException, ErrorEliminarLineaException, ErrorManejoArchivoException, ErrorGuardarClienteException {
+    private Cuenta validarCuentaOrigen(long idCuentaOrigen) throws ErrorArchivoException, CuentaServiceException{
+        Cuenta cuentaOrigen = cuentaDao.obtenerCuentaPorId(idCuentaOrigen);
+        if(cuentaOrigen == null){
+            throw new CuentaServiceException("No se ha encontrado la cuenta origen en la base de datos");
+        }
+        return cuentaOrigen;
+    }
+
+    private Cuenta validarCuentaDestino(long idCuentaDestino) throws TransferenciaServiceException, ErrorArchivoException {
+        Cuenta cuentaDestino = cuentaDao.obtenerCuentaPorId(idCuentaDestino);
+        if(cuentaDestino == null){
+            if (!banelcoService.transferir()) {
+                
+                throw new TransferenciaServiceException("La transferencia entre los bancos ha sido rechazada");
+            }
+        }
+        return cuentaDestino;
+    }
+
+    private void validarSaldo(Cuenta cuenta, double importe) throws TransferenciaException{
+        if (cuenta.getBalance() < importe) {
+            throw new TransferenciaException("No se puede realizar la transferencia, saldo insuficiente");
+        }
+    }
+    private void transferenciaDistintosBancos(Cuenta cuentaOrigen, double importe) throws ErrorArchivoException {
         // Calcular el importe que se acredita y debita, descontando los cargos
         double importeTotal = calcularCargo(cuentaOrigen.getMoneda(), importe);
 
@@ -91,18 +80,16 @@ public class TransferenciaService {
         cuentaDao.actualizarBalance(cuentaOrigen.getNumeroCuenta(), cuentaOrigen.getBalance() - importeTotal);
 
         // Agregar movimiento a la cuenta Origen
-        movimientosDao.agregarMovimiento(
-                new Movimiento(
-                        cuentaOrigen.getTitular(),
-                        LocalDate.now(),
-                        importeTotal,
-                        TipoOperacion.DEBITO,
-                        cuentaOrigen.getMoneda()));
+        Movimiento movimientoOrigen = new Movimiento();
+            movimientoOrigen.setFechaOperacion(LocalDate.now());
+            movimientoOrigen.setTipo(TipoMovimiento.DEBITO);
+            movimientoOrigen.setDescripcion("Transferencia realizada a otro banco");
+            movimientoOrigen.setMonto(importeTotal);
+            movimientosDao.guardarMovimiento(movimientoOrigen, cuentaOrigen.getNumeroCuenta());
+        
     }
 
-    private void transferenciaMismoBanco(Cuenta cuentaOrigen, Cuenta cuentaDestino, double importe)
-            throws ErrorArchivoNoEncontradoException, ErrorCuentaNoEncontradaException, ErrorGuardarCuentaException,
-            ErrorEliminarLineaException, ErrorManejoArchivoException, ErrorGuardarClienteException {
+    private void transferenciaMismoBanco(Cuenta cuentaOrigen, Cuenta cuentaDestino, double importe) throws ErrorArchivoException, CuentaServiceException{
         // Calcular el importe que se acredita y debita, descontando los cargos
         double importeTotal = calcularCargo(cuentaDestino.getMoneda(), importe);
 
@@ -110,32 +97,40 @@ public class TransferenciaService {
         cuentaDao.actualizarBalance(cuentaOrigen.getNumeroCuenta(), cuentaOrigen.getBalance() - importeTotal);
         cuentaDao.actualizarBalance(cuentaDestino.getNumeroCuenta(), cuentaDestino.getBalance() + importeTotal);
 
-        // Agregar movimiento a la cuenta Origen
-        movimientosDao.agregarMovimiento(
-                new Movimiento(
-                        cuentaOrigen.getTitular(),
-                        LocalDate.now(),
-                        importeTotal,
-                        TipoOperacion.DEBITO,
-                        cuentaOrigen.getMoneda()));
+         // Verificar que la moneda es la misma en ambas cuentra
+         if (cuentaDestino.getMoneda() != cuentaOrigen.getMoneda()) {
+            throw new CuentaServiceException("Las cuentas deben tener la misma moneda");
+        }
 
-        // Agregar movimiento a la cuenta Destino
-        movimientosDao.agregarMovimiento(
-                new Movimiento(
-                        cuentaDestino.getTitular(),
-                        LocalDate.now(),
-                        importeTotal,
-                        TipoOperacion.CREDITO,
-                        cuentaDestino.getMoneda()));
+        // Agregar movimiento a la cuenta Origen
+        agregarMovimiento(cuentaOrigen, importeTotal, true);
+        //Agregar movimiento a la cuenta Destino
+        agregarMovimiento(cuentaDestino, importeTotal, false);
+
     }
 
+    private void agregarMovimiento(Cuenta cuenta, double importe, boolean esDebito) throws ErrorArchivoException{
+        Movimiento movimiento = new Movimiento();
+        movimiento.setFechaOperacion(LocalDate.now());
+        movimiento.setTipo(esDebito ? TipoMovimiento.DEBITO : TipoMovimiento.CREDITO);
+        movimiento.setDescripcion(esDebito ? "Transferencia realizada" : "Transferencia recibida");
+        movimiento.setMonto(importe);
+        
+        movimientosDao.guardarMovimiento(movimiento,cuenta.getNumeroCuenta());
+        
+    }
     private double calcularCargo(TipoMoneda tipoMoneda, double importe) {
+        double cargo = 0;
         if (tipoMoneda == TipoMoneda.ARS && importe > 1000000) {
-            return importe - (importe * 0.02);
+            cargo = 0.2;
         }
         if (tipoMoneda == TipoMoneda.USD && importe > 5000) {
-            return importe - (importe * 0.05);
+            cargo = 0.05;
         }
-        return 0;
+        if (cargo > 0){
+            System.out.println("Cargo aplicado: " + cargo * importe);
+        }
+        return importe - (importe * cargo);
     }
+
 }

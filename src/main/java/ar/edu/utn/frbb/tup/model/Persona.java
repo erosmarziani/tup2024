@@ -1,7 +1,6 @@
 package ar.edu.utn.frbb.tup.model;
 
 import java.time.LocalDate;
-import java.time.Period;
 
 public class Persona {
     private String nombre;
@@ -51,12 +50,6 @@ public class Persona {
 
     public void setFechaNacimiento(LocalDate fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
-    }
-
-    public int getEdad() {
-        LocalDate currentDate = LocalDate.now();
-        Period agePeriod = Period.between(fechaNacimiento, currentDate);
-        return agePeriod.getYears();
     }
 
     public void setDireccion(String direccion){

@@ -11,13 +11,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
 
 @ControllerAdvice
 public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value
-            = {ClienteAlreadyExistsException.class, IllegalArgumentException.class})
+            = {IllegalArgumentException.class})
     protected ResponseEntity<Object> handleBadRequest( 
             Exception ex, WebRequest request) {
         String exceptionMessage = ex.getMessage();
@@ -41,6 +40,7 @@ public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHa
     }
 
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, @Nullable Object body, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         if (body == null) {

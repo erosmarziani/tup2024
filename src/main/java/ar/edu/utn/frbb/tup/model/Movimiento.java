@@ -1,63 +1,51 @@
 package ar.edu.utn.frbb.tup.model;
 
 import java.time.LocalDate;
+
+import ar.edu.utn.frbb.tup.controller.Dto.MovimientoDto;
 import ar.edu.utn.frbb.tup.model.enums.*;
 
 public class Movimiento {
-    private long idCuenta;
     private LocalDate fechaOperacion;
-    private double importe;
-    TipoOperacion tipoOperacion;
-    TipoMoneda tipoMoneda;
-    
+    private TipoMovimiento tipo;
+    private String descripcion;
+    private Double monto;
 
-    //Constructor para creacion sin ID
-    public Movimiento(long idCuenta, LocalDate fechaOperacion, double importe, TipoOperacion tipoOperacion, TipoMoneda tipoMoneda){
-        this.idCuenta = idCuenta;
-        this.fechaOperacion = fechaOperacion;
-        this.importe = importe;
-        this.tipoOperacion = tipoOperacion;
-        this.tipoMoneda = tipoMoneda;
-    }
-
-    public long getIdCuenta() {
-        return idCuenta;
-    }
-    
-    public void setIdCuenta(long idCuenta) {
-        this.idCuenta = idCuenta;
-    }
-    
+   //Constructor
+   public Movimiento(){
+        super();
+   }
+   public Movimiento (MovimientoDto movimientoDto) { 
+        this.fechaOperacion = LocalDate.parse(movimientoDto.getFechaOperacion());
+        this.tipo = TipoMovimiento.fromString(movimientoDto.getTipo());
+        this.descripcion = movimientoDto.getDescripcion();
+        this.monto = Double.parseDouble(movimientoDto.getMonto());
+   }
+    //Getters y setters
+   
     public LocalDate getFechaOperacion() {
         return fechaOperacion;
     }
-    
     public void setFechaOperacion(LocalDate fechaOperacion) {
         this.fechaOperacion = fechaOperacion;
     }
-
-    
-    public double getImporte() {
-        return importe;
+    public TipoMovimiento getTipo() {
+        return tipo;
+    }
+    public void setTipo(TipoMovimiento tipo) {
+        this.tipo = tipo;
+    }
+    public String getDescripcion() {
+        return descripcion;
+    }
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+    public double getMonto() {
+        return monto;
+    }
+    public void setMonto(double monto) {
+        this.monto = monto;
     }
     
-    public void setImporte(double importe) {
-        this.importe = importe;
-    }
-    
-    public TipoOperacion getTipoOperacion() {
-        return tipoOperacion;
-    }
-    
-    public void setTipoOperacion(TipoOperacion tipoOperacion) {
-        this.tipoOperacion = tipoOperacion;
-    }
-
-    public TipoMoneda getTipoMoneda() {
-        return tipoMoneda;
-    }
-    
-    public void setTipoMoneda(TipoMoneda tipoMoneda) {
-        this.tipoMoneda = tipoMoneda;
-    }
 }
