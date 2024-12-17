@@ -1,32 +1,17 @@
 Proyecto Final Laboratorio de Computacion III.
 Marziani Eros
 
-ENDPOINTS CLIENTE
-POST crearCliente: Crea un cliente y lo almacena en la base de datos.
-URL:"/cliente"
+Clientes:
+    POST /cliente: Crear cliente.
+    GET /cliente/{dni}: Obtener cliente por DNI.
+    GET /clientes: Obtener todos los clientes.
+    DELETE /cliente/{dni}: Eliminar cliente.
 
-GET obtenerCliente: Busca y devuelve un cliente especifico.
-URL:"/cliente/{dni}"
+Cuentas:
+    POST /cuentas: Crear cuenta.
+    GET /cuentas: Obtener todas las cuentas.
+    GET /cuentas/{idCliente}: Obtener cuentas de un cliente.
+    GET /cuentas/movimientos/{idCuenta}: Obtener movimientos de una cuenta.
 
-GET getClientes: Devuelve la totalidad de los clientes almacenados en la base de datos.
-URL:"/clientes"
-
-DELETE deleteCliente: Elimina un cliente especifico.
-URL:"/cliente/{dni}"
-
-ENDPOINTS CUENTA
-POST agregarCuenta: Agrega una cuenta vinculada con un cliente ya registrado.
-URL:"/cuentas"
-
-GET getCuentas: Devuelve la totalidad de las cuentas almacenadas en la base de datos
-URL: "/cuentas"
-
-GET getCuentaPorIdCliente: Devuelve las cuentas vinculadas con un cliente en particular.
-URL: "/cuentas/{idCliente}
-
-GET obtenerTransacciones: Devuelve los movimientos por cuenta
-URL: "/cuentas/movimientos/{idCuenta}
-
-ENDPOINT TRANSFERENCIAS
-POST transferencia: Realiza una transferencia entre dos cuentas
-URL: "/transferencia/"
+Transferencias:
+    POST /transferencia: Realizar transferencia entre cuentas.
