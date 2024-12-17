@@ -30,10 +30,6 @@ public class ClienteValidator {
         if (clienteDto.getDireccion() == null || clienteDto.getDireccion().isEmpty()) {
             throw new IllegalArgumentException("La dirección del cliente es obligatoria");
         }
-
-        if (clienteDto.getBanco() == null || clienteDto.getBanco().isEmpty()) {
-            throw new IllegalArgumentException("El banco utilizado es obligatorio");
-        }
         
     }
     public void validarFechaNacimiento(String fechaNacimiento){

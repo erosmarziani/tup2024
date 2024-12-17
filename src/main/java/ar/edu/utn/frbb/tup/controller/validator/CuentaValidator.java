@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CuentaValidator {
-    public void validarCuenta(CuentaDto cuentaDto) {
+    public void     validarCuenta(CuentaDto cuentaDto) {
 
         validarDatos(cuentaDto);
         validarDNI(cuentaDto.getDniTitular());

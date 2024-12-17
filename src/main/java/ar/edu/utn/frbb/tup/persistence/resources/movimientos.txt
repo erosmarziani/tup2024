@@ -1,1 +1,28 @@
-numeroCuenta
+numeroCuenta52525648;2024-12-15;DEBITO;Transferencia realizada;25.0
+52525648;2024-12-15;CREDITO;Transferencia recibida;25.0
+52525648;2024-12-15;DEBITO;Transferencia realizada;12345.0
+52525648;2024-12-15;CREDITO;Transferencia recibida;12345.0
+52525648;2024-12-15;DEBITO;Transferencia realizada;23.0
+52525648;2024-12-15;CREDITO;Transferencia recibida;23.0
+52525648;2024-12-16;DEBITO;Transferencia realizada;200.0
+52525648;2024-12-16;CREDITO;Transferencia recibida;200.0
+1;2024-12-16;DEBITO;Transferencia realizada;200.0
+1;2024-12-16;CREDITO;Transferencia recibida;200.0
+123456;2024-12-16;DEBITO;Transferencia realizada a otro banco;200.0
+123456;2024-12-16;DEBITO;Transferencia realizada a otro banco;200.0
+123456;2024-12-16;DEBITO;Transferencia realizada a otro banco;200.0
+123456;2024-12-16;DEBITO;Transferencia realizada a otro banco;200.0
+123456;2024-12-16;DEBITO;Transferencia realizada;200.0
+1;2024-12-16;CREDITO;Transferencia recibida;200.0
+123456;2024-12-16;DEBITO;Transferencia realizada;200.0
+1;2024-12-16;CREDITO;Transferencia recibida;200.0
+123456;2024-12-16;DEBITO;Transferencia realizada;200.0
+1;2024-12-16;CREDITO;Transferencia recibida;200.0
+123456;2024-12-16;DEBITO;Transferencia realizada;200.0
+1;2024-12-16;CREDITO;Transferencia recibida;200.0
+123456;2024-12-16;DEBITO;Transferencia realizada;200.0
+1;2024-12-16;CREDITO;Transferencia recibida;200.0
+123456;2024-12-16;DEBITO;Transferencia realizada;200.0
+1;2024-12-16;CREDITO;Transferencia recibida;200.0
+123456;2024-12-16;DEBITO;Transferencia realizada;20000.0
+1;2024-12-16;CREDITO;Transferencia recibida;20000.0

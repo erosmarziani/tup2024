@@ -33,15 +33,25 @@ public class CuentaService {
     private MovimientosDaoImpl movimientoDao;
 
     
-    public Cuenta altaCuenta(CuentaDto cuentaDto)
-            throws LecturaException, GuardadoException, ErrorArchivoException, ClienteServiceException {
-        Cuenta cuenta = new Cuenta(Long.parseLong(cuentaDto.getIdCuenta()), LocalDate.now(), 0,
-                TipoCuenta.valueOf(cuentaDto.getTipoCuenta()), Long.parseLong(cuentaDto.getDniTitular()),
+    public Cuenta altaCuenta(CuentaDto cuentaDto) throws ErrorArchivoException, ClienteServiceException, CuentaServiceException {
+
+        Cuenta cuentaExistente = cuentaDao.obtenerCuentaPorId(Long.parseLong(cuentaDto.getIdCuenta()));
+        if(cuentaExistente != null) {
+            throw new CuentaServiceException("Ya existe una cuenta con el ID proporcionado");
+        }
+        Cuenta cuenta = new Cuenta(
+            Long.parseLong(cuentaDto.getIdCuenta()),
+             LocalDate.now(),
+              Double.parseDouble(cuentaDto.getBalance()),
+                TipoCuenta.valueOf(cuentaDto.getTipoCuenta()),
+                Long.parseLong(cuentaDto.getDniTitular()),
                 TipoMoneda.valueOf(cuentaDto.getMoneda()));
+        
         Cliente clienteAsociado = clienteDao.obtenerClientePorDNI(cuenta.getTitular());
         if (clienteAsociado == null) {
             throw new ClienteServiceException("El cliente no ha sido encontrado en la base de datos");
         }
+        
         cuentaDao.guardarCuenta(cuenta);
         return cuenta;
 

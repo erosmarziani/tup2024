@@ -76,14 +76,12 @@ public class CuentaDaoImpl implements CuentasDAO {
                             Long.parseLong(datos[4]),
                             TipoMoneda.valueOf(datos[5])
 
-
                         );
                         //Obtener el cliente del Dao
                         Cliente titular = clienteDao.obtenerClientePorDNI(Long.parseLong(datos[4]));
                         if (titular == null) {
                             throw new ErrorArchivoException("No se encontró el cliente con el DNI");
                         }
-
                         return  cuentaObtenida;
                     }
                 }

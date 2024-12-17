@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,8 +16,6 @@ import ar.edu.utn.frbb.tup.controller.Dto.MovimientosResponseDto;
 import ar.edu.utn.frbb.tup.controller.validator.CuentaValidator;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorArchivoException;
-import ar.edu.utn.frbb.tup.persistence.exception.GuardadoException;
-import ar.edu.utn.frbb.tup.persistence.exception.LecturaException;
 import ar.edu.utn.frbb.tup.service.CuentaService;
 import ar.edu.utn.frbb.tup.service.exception.ClienteServiceException;
 import ar.edu.utn.frbb.tup.service.exception.CuentaServiceException;
@@ -39,25 +36,18 @@ public class CuentaController {
     }
 
     @GetMapping("/{dni}")
-    public ResponseEntity<List<Cuenta>> getCuentaPorIdCliente(@PathVariable Long dni) throws LecturaException, ErrorArchivoException, ClienteServiceException{
+    public ResponseEntity<List<Cuenta>> getCuentaPorIdCliente(@PathVariable Long dni) throws  ErrorArchivoException, ClienteServiceException{
         return ResponseEntity.ok(cuentaService.obtenerCuentasPorIdCliente(dni));
     }
 
     @PostMapping
-    public ResponseEntity<Cuenta> agregarCuenta(@RequestBody CuentaDto cuentaDto) throws   GuardadoException, LecturaException, ErrorArchivoException, ClienteServiceException{
+    public ResponseEntity<Cuenta> agregarCuenta(@RequestBody CuentaDto cuentaDto) throws ErrorArchivoException, ClienteServiceException, CuentaServiceException{
         cuentaValidator.validarCuenta(cuentaDto);
         return ResponseEntity.ok(cuentaService.altaCuenta(cuentaDto));
     }
-
-    @PutMapping("/modificar")
-    public ResponseEntity<Cuenta> modificarCuenta(@RequestBody CuentaDto cuentaDto) throws GuardadoException, ErrorArchivoException, CuentaServiceException{
-        cuentaValidator.validarCuenta(cuentaDto);
-        return ResponseEntity.ok(cuentaService.actualizarCuenta(cuentaDto));
-    } 
-
     @GetMapping("/movimientos/{idCuenta}")
-    public ResponseEntity<MovimientosResponseDto> obtenerTransacciones(@PathVariable Long numeroCuenta) throws ErrorArchivoException, CuentaServiceException{
-        MovimientosResponseDto response = cuentaService.obtenerMovimientos(numeroCuenta);
+    public ResponseEntity<MovimientosResponseDto> obtenerTransacciones(@PathVariable long idCuenta) throws ErrorArchivoException, CuentaServiceException{
+        MovimientosResponseDto response = cuentaService.obtenerMovimientos(idCuenta);
         return ResponseEntity.ok(response);
     }
 

@@ -33,7 +33,7 @@ public class TransferenciaService {
 
         Transferencia transferencia = new Transferencia(transferenciaDto);
 
-        Cuenta cuentaOrigen = validarCuentaOrigen(transferencia.getIdDestino());
+        Cuenta cuentaOrigen = validarCuentaOrigen(transferencia.getIdOrigen());
         Cuenta cuentaDestino = validarCuentaDestino(transferencia.getIdDestino());
         // Verificar saldo
         validarSaldo(cuentaOrigen,transferencia.getImporte());

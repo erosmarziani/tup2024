@@ -5,7 +5,6 @@ import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.service.exception.*;
 import ar.edu.utn.frbb.tup.persistence.exception.ErrorArchivoException;
-import ar.edu.utn.frbb.tup.persistence.exception.GuardadoException;
 import ar.edu.utn.frbb.tup.persistence.implementation.ClienteDaoImpl;
 import ar.edu.utn.frbb.tup.persistence.implementation.CuentaDaoImpl;
 
@@ -28,7 +27,7 @@ public class ClienteService {
         this.clienteDao = clienteDao;
     }
 
-    public Cliente darDeAltaCliente(ClienteDto clienteDto) throws GuardadoException, ErrorArchivoException, ClienteServiceException {
+    public Cliente darDeAltaCliente(ClienteDto clienteDto) throws ErrorArchivoException, ClienteServiceException {
         Cliente cliente = new Cliente(clienteDto);
 
         Cliente clienteExistente = clienteDao.obtenerClientePorDNI(cliente.getDni());

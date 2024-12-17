@@ -1,4 +1,4 @@
-package ar.edu.utn.frbb.tup.presentation.validator;
+package ar.edu.utn.frbb.tup.controller.validator;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import ar.edu.utn.frbb.tup.controller.Dto.CuentaDto;
-import ar.edu.utn.frbb.tup.controller.validator.CuentaValidator;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CuentaValidatorTest {

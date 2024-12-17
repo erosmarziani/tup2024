@@ -1,11 +1,10 @@
-package ar.edu.utn.frbb.tup.presentation.validator;
+package ar.edu.utn.frbb.tup.controller.validator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import ar.edu.utn.frbb.tup.controller.Dto.ClienteDto;
-import ar.edu.utn.frbb.tup.controller.validator.ClienteValidator;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,7 +27,6 @@ public class ClienteValidatorTest {
         clienteDto.setApellido("Marziani");
         clienteDto.setDireccion("Salta 432");
         clienteDto.setFechaNacimiento("2002-03-04");
-        clienteDto.setBanco("Credicoop");
         clienteDto.setDni("12341234");
 
         // Verifico que no haga ningun Throw
@@ -43,7 +41,6 @@ public class ClienteValidatorTest {
         clienteDto.setApellido("Marziani");
         clienteDto.setDireccion("Irigoyen 8879");
         clienteDto.setFechaNacimiento("2000-02-02");
-        clienteDto.setBanco("Galicia");
         clienteDto.setDni("11223388");
 
         assertThrows(IllegalArgumentException.class, () -> clienteValidator.validarCliente(clienteDto));
@@ -57,7 +54,6 @@ public class ClienteValidatorTest {
         // clienteDto.setApellido("Pomoro");
         clienteDto.setDireccion("Mitre 432");
         clienteDto.setFechaNacimiento("2000-12-12");
-        clienteDto.setBanco("ICBC");
         clienteDto.setDni("77889966");
 
         assertThrows(IllegalArgumentException.class, () -> clienteValidator.validarCliente(clienteDto));
@@ -71,7 +67,6 @@ public class ClienteValidatorTest {
         clienteDto.setApellido("Mateo");
         // clienteDto.setDireccion("");
         clienteDto.setFechaNacimiento("1999-03-02");
-        clienteDto.setBanco("Pampa");
         clienteDto.setDni("8888888");
 
         assertThrows(IllegalArgumentException.class, () -> clienteValidator.validarCliente(clienteDto));
@@ -85,22 +80,7 @@ public class ClienteValidatorTest {
         clienteDto.setApellido("Galati");
         clienteDto.setDireccion("Villarino 34");
         // clienteDto.setFechaNacimiento("");
-        clienteDto.setBanco("Supervielle");
         clienteDto.setDni("99999999");
-
-        assertThrows(IllegalArgumentException.class, () -> clienteValidator.validarCliente(clienteDto));
-    }
-
-    // Testeo de cliente sin banco
-    @Test
-    public void testClienteSinBanco() {
-        ClienteDto clienteDto = new ClienteDto();
-        clienteDto.setNombre("Daniela");
-        clienteDto.setApellido("Marziani");
-        clienteDto.setDireccion("Zeballos 290");
-        clienteDto.setFechaNacimiento("2003-05-07");
-        // clienteDto.setBanco("Macro");
-        clienteDto.setDni("24829115");
 
         assertThrows(IllegalArgumentException.class, () -> clienteValidator.validarCliente(clienteDto));
     }
@@ -112,7 +92,6 @@ public class ClienteValidatorTest {
         clienteDto.setApellido("Urquiza");
         clienteDto.setDireccion("Calle inexistente 345");
         clienteDto.setFechaNacimiento("1999-11-11");
-        clienteDto.setBanco("Galicia");
         // clienteDto.setDni();
 
         assertThrows(IllegalArgumentException.class, () -> clienteValidator.validarCliente(clienteDto));
@@ -125,7 +104,6 @@ public class ClienteValidatorTest {
      clienteDto.setApellido("Castro");
      clienteDto.setDireccion("San Jose 98");
      clienteDto.setFechaNacimiento("1980-01-01");
-      clienteDto.setBanco("Macro");
       clienteDto.setDni("-12341234");
      
       assertThrows(IllegalArgumentException.class, () ->
@@ -138,7 +116,6 @@ public class ClienteValidatorTest {
      clienteDto.setApellido("Castro");
      clienteDto.setDireccion("San Jose 98");
      clienteDto.setFechaNacimiento("2020-01-01");
-      clienteDto.setBanco("Macro");
       clienteDto.setDni("12341234");
 
       assertThrows(IllegalArgumentException.class, () ->
@@ -152,7 +129,6 @@ public class ClienteValidatorTest {
      clienteDto.setApellido("Castro");
      clienteDto.setDireccion("San Jose 98");
      clienteDto.setFechaNacimiento("1555-01-01");
-      clienteDto.setBanco("Macro");
       clienteDto.setDni("12341234");
       
       assertThrows(IllegalArgumentException.class, () ->
@@ -166,7 +142,6 @@ public class ClienteValidatorTest {
         clienteDto.setApellido("Castro");
         clienteDto.setDireccion("San Jose 98");
         clienteDto.setFechaNacimiento("01-2000-01");
-         clienteDto.setBanco("Macro");
          clienteDto.setDni("12341234");
 
          assertThrows(IllegalArgumentException.class, () ->
@@ -195,7 +170,6 @@ public class ClienteValidatorTest {
         clienteDto.setApellido("Castro");
         clienteDto.setDireccion("San Jose 98");
         clienteDto.setFechaNacimiento("01-2000-01");
-         clienteDto.setBanco("Macro");
          clienteDto.setDni("111111111111111111");
 
          assertThrows(IllegalArgumentException.class, () ->

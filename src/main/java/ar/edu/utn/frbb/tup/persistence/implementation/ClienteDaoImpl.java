@@ -25,8 +25,7 @@ public class ClienteDaoImpl implements ClientesDAO{
             writer.newLine();
         }catch(IOException e ){
             throw new ErrorArchivoException("Error al guardar el cliente en el archivo: " + e.getMessage());
-        }   
-                
+        }        
     }
 
     public Cliente parsearCliente(String[] datos) {
