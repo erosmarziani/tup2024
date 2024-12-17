@@ -45,7 +45,6 @@ class CuentaServiceTest {
 
     @Test
     void testAltaCuentaExitosa() throws ErrorArchivoException, ClienteServiceException, CuentaServiceException {
-        // Arrange
         CuentaDto cuentaDto = new CuentaDto();
         cuentaDto.setIdCuenta("1");
         cuentaDto.setBalance("1000");
@@ -59,10 +58,8 @@ class CuentaServiceTest {
         when(cuentaDao.obtenerCuentaPorId(1L)).thenReturn(null);
         when(clienteDao.obtenerClientePorDNI(12345678L)).thenReturn(cliente);
 
-        // Act
         Cuenta resultado = cuentaService.altaCuenta(cuentaDto);
 
-        // Assert
         assertNotNull(resultado);
         assertEquals(1L, resultado.getNumeroCuenta());
         assertEquals(1000.0, resultado.getBalance());
@@ -71,14 +68,12 @@ class CuentaServiceTest {
 
     @Test
     void testAltaCuentaYaExistente() throws ErrorArchivoException {
-        // Arrange
         CuentaDto cuentaDto = new CuentaDto();
         cuentaDto.setIdCuenta("1");
 
         Cuenta cuentaExistente = new Cuenta();
         when(cuentaDao.obtenerCuentaPorId(1L)).thenReturn(cuentaExistente);
 
-        // Act & Assert
         CuentaServiceException exception = assertThrows(CuentaServiceException.class, () -> {
             cuentaService.altaCuenta(cuentaDto);
         });
@@ -89,17 +84,14 @@ class CuentaServiceTest {
 
     @Test
     void testEliminarCuentasClienteExitoso() throws ErrorArchivoException, CuentaServiceException {
-        // Arrange
         long idCliente = 12345678L;
         Cuenta cuenta = new Cuenta();
         cuenta.setNumeroCuenta(1L);
 
         when(cuentaDao.eliminarCuenta(idCliente)).thenReturn(cuenta);
 
-        // Act
         Cuenta resultado = cuentaService.eliminarCuentasCliente(idCliente);
 
-        // Assert
         assertNotNull(resultado);
         assertEquals(1L, resultado.getNumeroCuenta());
         verify(cuentaDao, times(1)).eliminarCuenta(idCliente);
@@ -107,11 +99,9 @@ class CuentaServiceTest {
 
     @Test
     void testEliminarCuentasClienteNoExistente() throws ErrorArchivoException {
-        // Arrange
         long idCliente = 12345678L;
         when(cuentaDao.eliminarCuenta(idCliente)).thenReturn(null);
 
-        // Act & Assert
         CuentaServiceException exception = assertThrows(CuentaServiceException.class, () -> {
             cuentaService.eliminarCuentasCliente(idCliente);
         });
@@ -122,7 +112,6 @@ class CuentaServiceTest {
 
     @Test
     void testObtenerCuentasPorIdClienteExitoso() throws ErrorArchivoException, ClienteServiceException {
-        // Arrange
         long idCliente = 12345678L;
         Cliente cliente = new Cliente();
         cliente.setDni(12345678);
@@ -133,10 +122,8 @@ class CuentaServiceTest {
         when(clienteDao.obtenerClientePorDNI(idCliente)).thenReturn(cliente);
         when(cuentaDao.obtenerCuentasDelCliente(idCliente)).thenReturn(cuentas);
 
-        // Act
         List<Cuenta> resultado = cuentaService.obtenerCuentasPorIdCliente(idCliente);
 
-        // Assert
         assertNotNull(resultado);
         assertFalse(resultado.isEmpty());
         verify(cuentaDao, times(1)).obtenerCuentasDelCliente(idCliente);
@@ -144,7 +131,6 @@ class CuentaServiceTest {
 
     @Test
     void testObtenerMovimientosCuentaExitosa() throws CuentaServiceException, ErrorArchivoException {
-        // Arrange
         long idCuenta = 1L;
         Cuenta cuenta = new Cuenta();
         cuenta.setNumeroCuenta(1L);
@@ -160,10 +146,8 @@ class CuentaServiceTest {
         when(cuentaDao.obtenerCuentaPorId(idCuenta)).thenReturn(cuenta);
         when(movimientoDao.obtenerMovimientoPorCuenta(idCuenta)).thenReturn(movimientos);
 
-        // Act
         MovimientosResponseDto resultado = cuentaService.obtenerMovimientos(idCuenta);
 
-        // Assert
         assertNotNull(resultado);
         assertEquals("1", resultado.getNumeroCuenta());
         assertEquals(1, resultado.getTransacciones().size());
@@ -172,11 +156,9 @@ class CuentaServiceTest {
 
     @Test
     void testObtenerMovimientosCuentaNoExistente() throws ErrorArchivoException {
-        // Arrange
         long idCuenta = 1L;
         when(cuentaDao.obtenerCuentaPorId(idCuenta)).thenReturn(null);
 
-        // Act & Assert
         CuentaServiceException exception = assertThrows(CuentaServiceException.class, () -> {
             cuentaService.obtenerMovimientos(idCuenta);
         });

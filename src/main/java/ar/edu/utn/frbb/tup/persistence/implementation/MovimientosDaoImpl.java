@@ -37,18 +37,26 @@ public class MovimientosDaoImpl implements MovimientosDAO {
 
         File file = new File(FILE_PATH); //Creacion de archivo mediante la clase File
 
+        try(BufferedReader reader = new BufferedReader(new FileReader(file))){
+            String firstLine = reader.readLine();
+
+            boolean isEmpty = (firstLine == null || firstLine.trim().isEmpty());
+        
+
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))){
-            if(file.length() == 0){
+            if(isEmpty){
                 writer.write("idCuenta;fechaOperacion;tipo;descripcion;monto");
                 writer.newLine();
             }
             writer.write(numeroCuenta + ";" + movimiento.getFechaOperacion()+ 
             ";" + movimiento.getTipo() + ";" + movimiento.getDescripcion() + ";" + movimiento.getMonto() );
             writer.newLine();
+        }
         }catch( IOException e ){
             throw new ErrorArchivoException("Error al guardar el movimiento en el archivo: " , e);
-        }             
-    }
+        }      
+    }       
+    
     @Override
     public List<Movimiento> obtenerMovimientoPorCuenta(long idCuenta) throws ErrorArchivoException {
         List<Movimiento> listaMovimientos = new ArrayList<>();
@@ -75,6 +83,7 @@ public class MovimientosDaoImpl implements MovimientosDAO {
 
         return listaMovimientos;
     }
+
 
 
 }

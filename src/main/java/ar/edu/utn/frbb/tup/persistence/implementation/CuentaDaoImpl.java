@@ -243,8 +243,25 @@ public class CuentaDaoImpl implements CuentasDAO {
         }
     
         // Intentar guardar la cuenta actualizada
-            eliminarCuenta(numeroCuenta); // Eliminar la cuenta existente
-            guardarCuenta(cuentaActualizada); // Guardar la cuenta con los nuevos datos
+        try{
+            File file = new File(FILE_PATH);
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                writer.write("idCuenta;fechaAlta;balance;tipoCuenta;dniTitular;moneda");
+                writer.newLine();
+
+                for (Cuenta c : cuentas) {
+                    writer.write(c.getNumeroCuenta() + ";"
+                            + c.getFechaCreacion() + ";"
+                            + c.getBalance() + ";"
+                            + c.getTipoCuenta() + ";"
+                            + c.getTitular() + ";"
+                            + c.getMoneda());
+                    writer.newLine();
+                }
+            }
+        }catch(IOException e){
+            throw new ErrorArchivoException("Error al actualizar el balance de la cuenta");
+        }
         return cuentaActualizada;
     }
 

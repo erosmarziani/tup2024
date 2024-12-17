@@ -2,3 +2,4 @@ DNI;Nombre;Apellido;Fecha_Alta;Fecha_Nacimiento;Direccion;Telefono
 458597;Eros;Marziani;2024-12-15;2002-04-04;Roca 3;4885825
 38583564;Stephen;Curry;2024-12-15;1995-03-04;Brown 111;291685858
 12526398;Mariano;Caco;2024-12-16;1992-03-04;urquiza 111;291685858
+48558968;Lucas;Armani;2024-12-17;1992-03-04;urquiza 111;291685858

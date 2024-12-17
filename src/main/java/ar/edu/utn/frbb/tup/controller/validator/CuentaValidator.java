@@ -1,12 +1,14 @@
 package ar.edu.utn.frbb.tup.controller.validator;
 
 import ar.edu.utn.frbb.tup.controller.Dto.CuentaDto;
+import ar.edu.utn.frbb.tup.service.exception.ClienteServiceException;
+
 import org.springframework.stereotype.Component;
 
 
 @Component
 public class CuentaValidator {
-    public void     validarCuenta(CuentaDto cuentaDto) {
+    public void validarCuenta(CuentaDto cuentaDto) throws ClienteServiceException {
 
         validarDatos(cuentaDto);
         validarDNI(cuentaDto.getDniTitular());
