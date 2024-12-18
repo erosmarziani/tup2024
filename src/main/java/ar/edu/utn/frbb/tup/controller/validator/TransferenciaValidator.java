@@ -29,7 +29,7 @@ public class TransferenciaValidator {
         }
     }
 
-    private void validarImporte(String importe) throws TransferenciaException{
+    private void validarImporte(String importe) throws TransferenciaException, NumberFormatException{
         //Verifico que el dato ingresado no sea nulo o vacio
         if (importe == null || importe.isEmpty()) {
             throw new TransferenciaException("El importe de la transferencia es obligatorio");
@@ -40,8 +40,8 @@ public class TransferenciaValidator {
             if (Double.parseDouble(importe) < 0) {
                 throw new TransferenciaException("El importe de la transferencia no puede ser negativo");
             }
-        }catch(TransferenciaException e){
-            throw new TransferenciaException("El importe de la transferencia debe ser numérico");
+        }catch(NumberFormatException e){
+            throw new NumberFormatException("El importe de la transferencia debe ser numérico");
         }
     }
 
@@ -58,7 +58,7 @@ public class TransferenciaValidator {
         }
     }
     //Validacion de entrada de id
-    private void validarId(String idCuenta) throws NumberFormatException, TransferenciaException {
+    private void validarId(String idCuenta) throws TransferenciaException, NumberFormatException {
         //Verifico que el dato ingresado no sea nulo o vacio
         if (idCuenta == null || idCuenta.isEmpty()) {
         throw new TransferenciaException("El id de la cuenta es obligatorio");
@@ -68,7 +68,7 @@ public class TransferenciaValidator {
             Long.parseLong(idCuenta);
         //Veriico que el numero de cuenta no sea negativo
         if (Long.parseLong(idCuenta) < 0) {
-            throw new NumberFormatException("El id de la cuenta no puede ser negativo");
+            throw new TransferenciaException("El id de la cuenta no puede ser negativo");
         }
         }catch(NumberFormatException e){
             throw new NumberFormatException("El id de la cuenta debe ser numérico");

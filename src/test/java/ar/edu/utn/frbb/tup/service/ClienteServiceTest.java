@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 class ClienteServiceTest {
@@ -56,8 +58,12 @@ class ClienteServiceTest {
         // Assert
         assertNotNull(resultado);
         assertEquals(cliente.getDni(), resultado.getDni());
-        verify(clienteDao, times(1)).guardarCliente(cliente);
-    }
+        verify(clienteDao, times(1)).guardarCliente(argThat(clienteGuardado ->
+         clienteGuardado.getDni() == Long.parseLong(clienteDto.getDni()) &&
+        clienteGuardado.getNombre().equals(clienteDto.getNombre()) &&
+        clienteGuardado.getApellido().equals(clienteDto.getApellido())
+        //Verifico que los atributos sean iguales
+));    }
 
     @Test
     void testDarDeAltaClienteYaExistente() throws ErrorArchivoException {
@@ -86,25 +92,27 @@ class ClienteServiceTest {
     void testEliminarClienteExitoso() throws ErrorArchivoException, ClienteServiceException {
         // Arrange
         long dni = 12345678L;
+    
         Cliente cliente = new Cliente();
         cliente.setDni(dni);
-
-        List<Cuenta> cuentas = new ArrayList<>();
-        cuentas.add(new Cuenta());
-
+    
+        Cuenta cuenta = new Cuenta();
+        cuenta.setNumeroCuenta(1L);
+        List<Cuenta> cuentas = List.of(cuenta);
+    
         when(clienteDao.obtenerClientePorDNI(dni)).thenReturn(cliente);
         when(cuentaDao.obtenerCuentasDelCliente(dni)).thenReturn(cuentas);
-
+    
         // Act
         Cliente resultado = clienteService.eliminarCliente(dni);
-
+    
         // Assert
         assertNotNull(resultado);
-        assertEquals(cliente.getDni(), resultado.getDni());
-        verify(cuentaDao, times(1)).eliminarCuenta(anyLong());
+        assertEquals(dni, resultado.getDni());
+        verify(cuentaDao, times(1)).eliminarCuenta(1L);
         verify(clienteDao, times(1)).eliminarCliente(dni);
     }
-
+    
     @Test
     void testEliminarClienteNoExistente() throws ErrorArchivoException {
         // Arrange

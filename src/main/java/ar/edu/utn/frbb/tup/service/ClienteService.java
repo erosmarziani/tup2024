@@ -23,10 +23,11 @@ public class ClienteService {
     @Autowired
     private CuentaDaoImpl cuentaDao;    
 
-    public ClienteService(ClienteDaoImpl clienteDao) {
+    public ClienteService(ClienteDaoImpl clienteDao, CuentaDaoImpl cuentaDao) {
         this.clienteDao = clienteDao;
+        this.cuentaDao = cuentaDao;
     }
-
+    
     public Cliente darDeAltaCliente(ClienteDto clienteDto) throws ErrorArchivoException, ClienteServiceException {
         Cliente cliente = new Cliente(clienteDto);
 
@@ -61,7 +62,6 @@ public class ClienteService {
         }
        
         clienteDao.eliminarCliente(dni);
-        cuentaDao.eliminarCuenta(dni);
 
         return cliente;
 

@@ -4,13 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.time.format.DateTimeParseException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import ar.edu.utn.frbb.tup.controller.Dto.TransferenciaDto;
+import ar.edu.utn.frbb.tup.controller.exception.TransferenciaException;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TransferenciaValidatorTest{
@@ -44,7 +44,7 @@ public class TransferenciaValidatorTest{
         transferenciaDto.setImporte("1000.50");
         transferenciaDto.setTipoMoneda("USD");
 
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, 
+        TransferenciaException thrown = assertThrows(TransferenciaException.class, 
                 () -> transferenciaValidator.validarTransferencia(transferenciaDto));
         assertEquals("El id de la cuenta es obligatorio", thrown.getMessage());
     }
@@ -59,7 +59,7 @@ public class TransferenciaValidatorTest{
         transferenciaDto.setImporte("1000.50");
         transferenciaDto.setTipoMoneda("USD");
 
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, 
+        TransferenciaException thrown = assertThrows(TransferenciaException.class, 
                 () -> transferenciaValidator.validarTransferencia(transferenciaDto));
         assertEquals("El id de la cuenta es obligatorio", thrown.getMessage());
     }
@@ -74,7 +74,7 @@ public class TransferenciaValidatorTest{
         transferenciaDto.setImporte("1000.50");
         transferenciaDto.setTipoMoneda("USD");
 
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, 
+        TransferenciaException thrown = assertThrows(TransferenciaException.class, 
                 () -> transferenciaValidator.validarTransferencia(transferenciaDto));
         assertEquals("La fecha de operacion es obligatoria", thrown.getMessage());
     }
@@ -89,7 +89,7 @@ public class TransferenciaValidatorTest{
         //transferenciaDto.setImporte(null);
         transferenciaDto.setTipoMoneda("USD");
 
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, 
+        TransferenciaException thrown = assertThrows(TransferenciaException.class, 
                 () -> transferenciaValidator.validarTransferencia(transferenciaDto));
         assertEquals("El importe de la transferencia es obligatorio", thrown.getMessage());
     }
@@ -104,7 +104,7 @@ public class TransferenciaValidatorTest{
         transferenciaDto.setImporte("numero");
         transferenciaDto.setTipoMoneda("USD");
 
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, 
+        NumberFormatException thrown = assertThrows(NumberFormatException.class, 
                 () -> transferenciaValidator.validarTransferencia(transferenciaDto));
         assertEquals("El importe de la transferencia debe ser numérico", thrown.getMessage());
     }
@@ -119,7 +119,7 @@ public class TransferenciaValidatorTest{
         transferenciaDto.setImporte("-1000.50");
         transferenciaDto.setTipoMoneda("USD");
 
-        assertThrows(IllegalArgumentException.class, () -> transferenciaValidator.validarTransferencia(transferenciaDto));
+        assertThrows(TransferenciaException.class, () -> transferenciaValidator.validarTransferencia(transferenciaDto));
 
     }
 
@@ -135,7 +135,7 @@ public class TransferenciaValidatorTest{
       //  transferenciaDto.setTipoMoneda(null);
 
         
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, 
+      TransferenciaException thrown = assertThrows(TransferenciaException.class, 
                 () -> transferenciaValidator.validarTransferencia(transferenciaDto));
         assertEquals("El tipo de moneda es obligatorio", thrown.getMessage());
     }
@@ -152,7 +152,7 @@ public class TransferenciaValidatorTest{
         transferenciaDto.setTipoMoneda("EUR"); // Moneda inválida
 
         // Act & Assert
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, 
+        TransferenciaException thrown = assertThrows(TransferenciaException.class, 
                 () -> transferenciaValidator.validarTransferencia(transferenciaDto));
         assertEquals("El tipo de moneda debe ser USD o ARS", thrown.getMessage());
     }
@@ -167,7 +167,7 @@ public class TransferenciaValidatorTest{
         transferenciaDto.setImporte("1000.50");
         transferenciaDto.setTipoMoneda("USD");
 
-        assertThrows(DateTimeParseException.class, () ->
+        assertThrows(TransferenciaException.class, () ->
       transferenciaValidator.validarFecha(transferenciaDto.getFechaOperacion()));
     }
 }

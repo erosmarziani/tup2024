@@ -1,18 +1,13 @@
 package ar.edu.utn.frbb.tup.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyDouble;
+
 import static org.mockito.Mockito.*;
 
 import ar.edu.utn.frbb.tup.controller.Dto.TransferenciaDto;
-import ar.edu.utn.frbb.tup.controller.exception.TransferenciaException;
 import ar.edu.utn.frbb.tup.model.Cuenta;
-import ar.edu.utn.frbb.tup.model.Movimiento;
 import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 import ar.edu.utn.frbb.tup.persistence.implementation.CuentaDaoImpl;
 import ar.edu.utn.frbb.tup.persistence.implementation.MovimientosDaoImpl;
-import ar.edu.utn.frbb.tup.service.exception.CuentaServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
